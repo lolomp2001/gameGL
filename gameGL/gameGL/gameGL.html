@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+
+<script id="shader-vs" type="x-shader/x-vertex">
+attribute vec2 a_position;
+attribute vec2 aTextureCoord;
+
+uniform vec2 u_resolution;
+uniform vec2 u_translation;
+
+varying vec2 vTextureCoord;
+
+void main() {
+
+	// Add in the translation.
+	vec2 position = a_position + u_translation;
+
+	// convert the rectangle from pixels to 0.0 to 1.0
+	vec2 zeroToOne = position / u_resolution;
+
+	// convert from 0->1 to 0->2
+	vec2 zeroToTwo = zeroToOne * 2.0;
+
+	// convert from 0->2 to -1->+1 (clipspace)
+	vec2 clipSpace = zeroToTwo - 1.0;
+
+	gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+	vTextureCoord = aTextureCoord;
+}
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+precision mediump float;
+
+varying vec2 vTextureCoord;
+
+uniform sampler2D uSampler;
+
+void main(void) {
+	gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+}
+</script>
+
+<script type="text/javascript" src="Consts.js"></script>
+<script type="text/javascript" src="mainGL.js"></script>
+<script type="text/javascript" src="GameGL.js"></script>
+<script type="text/javascript" src="DynCursor.js"></script>
+
+<title>BaseGL</title>
+</head>
+<body onload="startGameGL();">
+<canvas id="gameGL" style="border: none;"></canvas>
+</body>
+</html>

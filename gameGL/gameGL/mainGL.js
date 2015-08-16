@@ -1,0 +1,174 @@
+var canvas;
+var gl;
+var shaderProgram;
+var resolutionLocation;
+var translationLocation;
+var textureLocation;
+var samplerUniform;
+var mousePos = {x : 0, y : 0};
+
+function startGameGL() {
+	document.documentElement.style.overflow = 'hidden';
+	window.addEventListener('resize', resize, false);
+	
+	canvas = document.getElementById("gameGL");
+	
+	canvas.width=0.9*window.innerWidth;
+	canvas.height=0.9*window.innerHeight;
+	canvas.style.left = 0.08*window.innerWidth/2 +"px";
+	canvas.style.top = 0.08*window.innerHeight/2 +"px";
+	canvas.style.position = "relative";
+	canvas.style.cursor = "none";
+
+	initWebGL(canvas); // Initialise le contexte WebGL
+
+	// Continue seulement si le WebGL est disponible et est en train de fonctionner
+
+	if (gl) {
+
+		// Initialize the shaders; this is where all the lighting for the
+		// vertices and so forth is established.
+
+		initShaders();
+		
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.clearDepth(1);
+		gl.disable(gl.DEPTH_TEST);
+		gl.enable(gl.BLEND);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+		
+		var gameGL = new GameGL();
+
+		canvas.addEventListener('mousemove', function(evt) {
+			var rect = canvas.getBoundingClientRect();
+			mousePos = getMousePos(canvas, evt);
+			gameGL.unpdateCursor();
+			}, false);
+		
+		// Set up to draw the scene periodically.
+		
+		
+		setInterval(function(){gameGL.draw();}, 15);
+	}
+}
+
+function getMousePos(canvas, evt) {
+	var rect = canvas.getBoundingClientRect();
+	return {
+		x : evt.clientX - rect.left,
+		y : evt.clientY - rect.top
+	};
+}
+
+function initWebGL(canvas) {
+	// Initialise la variable gloable gl à null
+	gl = null;
+
+	try {
+		// Essaye de récupérer le contexte standard. En cas d'échec, il teste l'appel experimental
+		gl = canvas.getContext("webgl")	|| canvas.getContext("experimental-webgl");
+		gl.viewportWidth = canvas.width;
+	    gl.viewportHeight = canvas.height;
+	} catch (e) {
+	}
+
+	// Si le contexte GL n'est pas récupéré, on l'indique à l'utilisateur.
+	if (!gl) {
+		alert("Impossible d'initialiser le WebGL. Il est possible que votre navigateur ne supporte pas cette fonctionnalité.");
+	}
+}
+
+function initShaders() {
+	var fragmentShader = getShader(gl, "shader-fs");
+	var vertexShader = getShader(gl, "shader-vs");
+
+	// Créer le programme shader
+
+	shaderProgram = gl.createProgram();
+	gl.attachShader(shaderProgram, vertexShader);
+	gl.attachShader(shaderProgram, fragmentShader);
+	gl.linkProgram(shaderProgram);
+	
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+
+	// Faire une alerte si le chargement du shader échoue
+
+	if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+		alert("Impossible d'initialiser le shader.");
+	}
+
+	gl.useProgram(shaderProgram);
+
+	shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram,	"a_position");
+	gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+	
+	shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+	gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+
+	resolutionLocation = gl.getUniformLocation(shaderProgram, "u_resolution");
+	gl.uniform2f(resolutionLocation, gl.viewportWidth, gl.viewportHeight);
+	
+	translationLocation = gl.getUniformLocation(shaderProgram, "u_translation");
+	
+	textureLocation = gl.getUniformLocation(shaderProgram, "u_textureSize");
+	
+	samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
+}
+
+function getShader(gl, id) {
+	var shaderScript, theSource, currentChild, shader;
+
+	shaderScript = document.getElementById(id);
+
+	if (!shaderScript) {
+		return null;
+	}
+
+	theSource = "";
+	currentChild = shaderScript.firstChild;
+
+	while (currentChild) {
+		if (currentChild.nodeType == currentChild.TEXT_NODE) {
+			theSource += currentChild.textContent;
+		}
+
+		currentChild = currentChild.nextSibling;
+	}
+
+	if (shaderScript.type == "x-shader/x-fragment") {
+		shader = gl.createShader(gl.FRAGMENT_SHADER);
+	} else if (shaderScript.type == "x-shader/x-vertex") {
+		shader = gl.createShader(gl.VERTEX_SHADER);
+	} else {
+		// type de shader inconnu
+		return null;
+	}
+	gl.shaderSource(shader, theSource);
+
+	// Compile le programme shader
+	gl.compileShader(shader);
+
+	// Vérifie si la compilation s'est bien déroulée
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+		alert("Une erreur est survenue au cours de la compilation des shaders: "
+				+ gl.getShaderInfoLog(shader));
+		return null;
+	}
+
+	return shader;
+}
+
+function resize() {
+	var canvas = document.getElementById("gameGL");
+	canvas.width=0.9*window.innerWidth;
+	canvas.height=0.9*window.innerHeight;
+	canvas.style.left = 0.08*window.innerWidth/2 +"px";
+	canvas.style.top = 0.08*window.innerHeight/2 +"px";
+	canvas.style.position = "relative";
+	
+	gl.viewportWidth = canvas.width;
+    gl.viewportHeight = canvas.height;
+    
+    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+}
