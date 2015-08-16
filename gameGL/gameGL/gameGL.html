@@ -39,13 +39,14 @@ varying vec2 vTextureCoord;
 uniform sampler2D uSampler;
 
 void main(void) {
-	gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+	gl_FragColor = texture2D(uSampler, vTextureCoord);
 }
 </script>
 
 <script type="text/javascript" src="Consts.js"></script>
 <script type="text/javascript" src="mainGL.js"></script>
 <script type="text/javascript" src="GameGL.js"></script>
+<script type="text/javascript" src="Ground.js"></script>
 <script type="text/javascript" src="DynCursor.js"></script>
 
 <title>BaseGL</title>

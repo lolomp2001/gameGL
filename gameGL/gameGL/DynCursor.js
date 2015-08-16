@@ -1,6 +1,6 @@
 function DynCursor() {
 	this.squareVerticesBuffer;
-	this.squareVerticesTestCoorBuffer;
+	this.squareVerticesTextCoorBuffer;
 	this.dynCursorText;
 	this.iXGridPos;
 	this.iYGridPos;
@@ -15,22 +15,22 @@ DynCursor.prototype.initCursorMesh = function (){
 			MAP_TILE_WIDTH / 2,	MAP_TILE_HEIGHT / 2, 0.0, 
 			-MAP_TILE_WIDTH / 2, -MAP_TILE_HEIGHT / 2, 0.0, 
 			-MAP_TILE_WIDTH / 2, MAP_TILE_HEIGHT / 2, 0.0, 
-			MAP_TILE_WIDTH / 2, MAP_TILE_HEIGHT / 2, 0.0, ];
+			MAP_TILE_WIDTH / 2, MAP_TILE_HEIGHT / 2, 0.0 ];
     
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
 	this.squareVerticesBuffer.itemSize = 3;
 	this.squareVerticesBuffer.numItems = 6;
 	
-	this.squareVerticesTestCoorBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTestCoorBuffer);
+	this.squareVerticesTextCoorBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
 	
-	var textCoord = [ 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0 ];
+	var textCoord = [ 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0 ];
 	
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textCoord), gl.STATIC_DRAW);
 	
-	this.squareVerticesTestCoorBuffer.itemSize = 2;
-	this.squareVerticesTestCoorBuffer.numItems = 6;
+	this.squareVerticesTextCoorBuffer.itemSize = 2;
+	this.squareVerticesTextCoorBuffer.numItems = 6;
 
 }
 
@@ -45,8 +45,8 @@ DynCursor.prototype.draw = function (){
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
 	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.squareVerticesBuffer.itemSize, gl.FLOAT, false, 0, 0);
 	
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTestCoorBuffer);
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.squareVerticesTestCoorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
+    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.squareVerticesTextCoorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 	
     gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.dynCursorText);
@@ -68,7 +68,7 @@ DynCursor.prototype.handleLoadedTexture = function (texture) {
 }
 
 DynCursor.prototype.initTexture = function() {
-	texture = gl.createTexture();
+	var texture = gl.createTexture();
 	texture.image = new Image();
 
 	texture.image.onload = function() {
