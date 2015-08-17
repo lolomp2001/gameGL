@@ -36,6 +36,8 @@ DynCursor.prototype.initCursorMesh = function (){
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
 		  
 	var indices = [ 0, 1, 2, 0, 2, 3 ];
+	
+	this.squareVerticesIndexBuffer.numItems = indices.length;
 
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices),
 			gl.STATIC_DRAW);
@@ -62,7 +64,7 @@ DynCursor.prototype.draw = function (){
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
     
-    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, this.squareVerticesIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 	
 }
 

@@ -6,47 +6,64 @@ function Ground() {
 }
 
 Ground.prototype.initGroundMesh = function (){
+	var xScale = BACKGROUND_TILE_WIDTH - BACKGROUND_X_OFFSET;
+	var yScale = BACKGROUND_TILE_HEIGHT - BACKGROUND_Y_OFFSET;
+	var xOffset = 0;
+	var yOffset = 0;
+	
 	this.squareVerticesBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
+	
 
 	var vertices = [  -BACKGROUND_TEXTURE_WIDTH / 2, -BACKGROUND_TEXTURE_HEIGHT / 2,
 	                  -BACKGROUND_TEXTURE_WIDTH / 2, BACKGROUND_TEXTURE_HEIGHT / 2, 
 	                  BACKGROUND_TEXTURE_WIDTH / 2,	BACKGROUND_TEXTURE_HEIGHT / 2, 
 	    			BACKGROUND_TEXTURE_WIDTH / 2, -BACKGROUND_TEXTURE_HEIGHT / 2 ];
 	
-	vertices.push( -BACKGROUND_TEXTURE_WIDTH / 2 + 200, -BACKGROUND_TEXTURE_HEIGHT / 2,
-            -BACKGROUND_TEXTURE_WIDTH / 2 + 200, BACKGROUND_TEXTURE_HEIGHT / 2, 
-            BACKGROUND_TEXTURE_WIDTH / 2 + 200,	BACKGROUND_TEXTURE_HEIGHT / 2, 
-			BACKGROUND_TEXTURE_WIDTH / 2 + 200, -BACKGROUND_TEXTURE_HEIGHT / 2 );
-	
-
-	
-	
-    
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
 	this.squareVerticesBuffer.itemSize = 2;
-	this.squareVerticesBuffer.numItems = 8;
+	this.squareVerticesBuffer.numItems = 4;
 	
 	this.squareVerticesTextCoorBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
-	
 	var textCoord = [ 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 ];
-	
-	textCoord.push( 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 );
-	
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textCoord), gl.STATIC_DRAW);
-	
 	this.squareVerticesTextCoorBuffer.itemSize = 2;
-	this.squareVerticesTextCoorBuffer.numItems = 8;
+	this.squareVerticesTextCoorBuffer.numItems = 4;
 	
 	this.squareVerticesIndexBuffer = gl.createBuffer();
+	var indices = [ 0, 1, 2, 0, 2, 3 ];
+	this.squareVerticesIndexBuffer.numItems = 6;
+	
+	var xIteration = Math.round(gl.viewportWidth/xScale);
+	var yIteration = Math.round(gl.viewportHeight/yScale);
+	var k = 0;
+	for (var i=0; i<=xIteration; i++) {
+
+		xOffset += 18;
+		yOffset += 12;
+		
+		for (var j=0; j<=yIteration; j++) {
+
+			vertices.push( -BACKGROUND_TEXTURE_WIDTH / 2 + xScale*i - xOffset, -BACKGROUND_TEXTURE_HEIGHT / 2 + yScale*j - yOffset,
+		            -BACKGROUND_TEXTURE_WIDTH / 2 + xScale*i - xOffset, BACKGROUND_TEXTURE_HEIGHT / 2 + yScale*j - yOffset, 
+		            BACKGROUND_TEXTURE_WIDTH / 2 + xScale*i - xOffset,	BACKGROUND_TEXTURE_HEIGHT / 2 + yScale*j - yOffset, 
+					BACKGROUND_TEXTURE_WIDTH / 2 + xScale*i - xOffset, -BACKGROUND_TEXTURE_HEIGHT / 2 + yScale*j - yOffset );
+			
+			this.squareVerticesBuffer.numItems += 4;
+		
+			textCoord.push( 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 );
+			this.squareVerticesTextCoorBuffer.numItems += 4;
+			
+			indices.push(4*k, 4*k+1, 4*k+2, 4*k, 4*k+2, 4*k+3);
+			this.squareVerticesIndexBuffer.numItems += 6;
+			k++;
+		}
+	}
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textCoord), gl.STATIC_DRAW);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
-	  
-	var indices = [ 0, 1, 2, 0, 2, 3, 
-	                4, 5, 6, 4, 6, 7 ];
-
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices),
 			gl.STATIC_DRAW);
 	
@@ -54,7 +71,7 @@ Ground.prototype.initGroundMesh = function (){
 
 Ground.prototype.draw = function (){
 
-	gl.uniform2f(translationLocation, 100, 100);
+	gl.uniform2f(translationLocation, 0, 0);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
 	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.squareVerticesBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -69,8 +86,8 @@ Ground.prototype.draw = function (){
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
     
-    gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, 0);
-	
+    gl.drawElements(gl.TRIANGLES, this.squareVerticesIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
 }
 
 Ground.prototype.handleLoadedTexture = function (texture) {
