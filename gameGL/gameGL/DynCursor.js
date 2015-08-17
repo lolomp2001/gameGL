@@ -1,6 +1,7 @@
 function DynCursor() {
 	this.squareVerticesBuffer;
 	this.squareVerticesTextCoorBuffer;
+	this.squareVerticesIndexBuffer;
 	this.dynCursorText;
 	this.iXGridPos;
 	this.iYGridPos;
@@ -10,27 +11,34 @@ DynCursor.prototype.initCursorMesh = function (){
 	this.squareVerticesBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
 
-	var vertices = [ -MAP_TILE_WIDTH / 2, -MAP_TILE_HEIGHT / 2, 0.0,
-			MAP_TILE_WIDTH / 2, -MAP_TILE_HEIGHT / 2, 0.0, 
-			MAP_TILE_WIDTH / 2,	MAP_TILE_HEIGHT / 2, 0.0, 
-			-MAP_TILE_WIDTH / 2, -MAP_TILE_HEIGHT / 2, 0.0, 
-			-MAP_TILE_WIDTH / 2, MAP_TILE_HEIGHT / 2, 0.0, 
-			MAP_TILE_WIDTH / 2, MAP_TILE_HEIGHT / 2, 0.0 ];
+	var vertices = [ -MAP_TILE_WIDTH / 2, -MAP_TILE_HEIGHT / 2,
+			-MAP_TILE_WIDTH / 2, MAP_TILE_HEIGHT / 2, 
+			MAP_TILE_WIDTH / 2,	MAP_TILE_HEIGHT / 2, 
+			MAP_TILE_WIDTH / 2, -MAP_TILE_HEIGHT / 2 ];
     
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-	this.squareVerticesBuffer.itemSize = 3;
-	this.squareVerticesBuffer.numItems = 6;
+	this.squareVerticesBuffer.itemSize = 2;
+	this.squareVerticesBuffer.numItems = 4;
 	
 	this.squareVerticesTextCoorBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
 	
-	var textCoord = [ 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0 ];
+	var textCoord = [ 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 ];
 	
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textCoord), gl.STATIC_DRAW);
 	
 	this.squareVerticesTextCoorBuffer.itemSize = 2;
-	this.squareVerticesTextCoorBuffer.numItems = 6;
+	this.squareVerticesTextCoorBuffer.numItems = 4;
+	
+	this.squareVerticesIndexBuffer = gl.createBuffer();
+
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
+		  
+	var indices = [ 0, 1, 2, 0, 2, 3 ];
+
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices),
+			gl.STATIC_DRAW);
 
 }
 
@@ -52,7 +60,9 @@ DynCursor.prototype.draw = function (){
 	gl.bindTexture(gl.TEXTURE_2D, this.dynCursorText);
     gl.uniform2f(samplerUniform, MAP_TILE_WIDTH, MAP_TILE_HEIGHT);
     
-	gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.squareVerticesBuffer.numItems);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
+    
+    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 	
 }
 
