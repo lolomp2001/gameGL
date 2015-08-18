@@ -19,6 +19,9 @@ function startGameGL() {
 	canvas.style.top = 0.08*window.innerHeight/2 +"px";
 	canvas.style.position = "relative";
 	canvas.style.cursor = "none";
+	
+	canvas.initialWidth = canvas.width;
+	canvas.initialHeight = canvas.height;
 
 	initWebGL(canvas); // Initialise le contexte WebGL
 
@@ -56,8 +59,8 @@ function startGameGL() {
 function getMousePos(canvas, evt) {
 	var rect = canvas.getBoundingClientRect();
 	return {
-		x : evt.clientX - rect.left,
-		y : evt.clientY - rect.top
+		x : (evt.clientX - rect.left)*canvas.initialWidth/canvas.width,
+		y : (evt.clientY - rect.top)*canvas.initialHeight/canvas.height
 	};
 }
 
@@ -165,7 +168,6 @@ function resize() {
 	canvas.height=0.9*window.innerHeight;
 	canvas.style.left = 0.08*window.innerWidth/2 +"px";
 	canvas.style.top = 0.08*window.innerHeight/2 +"px";
-	canvas.style.position = "relative";
 	
 	gl.viewportWidth = canvas.width;
     gl.viewportHeight = canvas.height;

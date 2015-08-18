@@ -6,56 +6,26 @@ function Ground() {
 }
 
 Ground.prototype.initGroundMesh = function (){
-	var xScale = BACKGROUND_TILE_WIDTH - BACKGROUND_X_OFFSET;
-	var yScale = BACKGROUND_TILE_HEIGHT - BACKGROUND_Y_OFFSET;
-	var xOffset = 0;
-	var yOffset = 0;
+	
 	
 	this.squareVerticesBuffer = gl.createBuffer();
 	
 
-	var vertices = [  -BACKGROUND_TEXTURE_WIDTH / 2, -BACKGROUND_TEXTURE_HEIGHT / 2,
-	                  -BACKGROUND_TEXTURE_WIDTH / 2, BACKGROUND_TEXTURE_HEIGHT / 2, 
-	                  BACKGROUND_TEXTURE_WIDTH / 2,	BACKGROUND_TEXTURE_HEIGHT / 2, 
-	    			BACKGROUND_TEXTURE_WIDTH / 2, -BACKGROUND_TEXTURE_HEIGHT / 2 ];
+	var vertices = [ ];
 	
 	this.squareVerticesBuffer.itemSize = 2;
-	this.squareVerticesBuffer.numItems = 4;
+	this.squareVerticesBuffer.numItems = 0;
 	
 	this.squareVerticesTextCoorBuffer = gl.createBuffer();
-	var textCoord = [ 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 ];
+	var textCoord = [ ];
 	this.squareVerticesTextCoorBuffer.itemSize = 2;
-	this.squareVerticesTextCoorBuffer.numItems = 4;
+	this.squareVerticesTextCoorBuffer.numItems = 0;
 	
 	this.squareVerticesIndexBuffer = gl.createBuffer();
-	var indices = [ 0, 1, 2, 0, 2, 3 ];
-	this.squareVerticesIndexBuffer.numItems = 6;
+	var indices = [ ];
+	this.squareVerticesIndexBuffer.numItems = 0;
 	
-	var xIteration = Math.round(gl.viewportWidth/xScale);
-	var yIteration = Math.round(gl.viewportHeight/yScale);
-	var k = 0;
-	for (var i=0; i<=xIteration; i++) {
-
-		xOffset += 18;
-		yOffset += 12;
-		
-		for (var j=0; j<=yIteration; j++) {
-
-			vertices.push( -BACKGROUND_TEXTURE_WIDTH / 2 + xScale*i - xOffset, -BACKGROUND_TEXTURE_HEIGHT / 2 + yScale*j - yOffset,
-		            -BACKGROUND_TEXTURE_WIDTH / 2 + xScale*i - xOffset, BACKGROUND_TEXTURE_HEIGHT / 2 + yScale*j - yOffset, 
-		            BACKGROUND_TEXTURE_WIDTH / 2 + xScale*i - xOffset,	BACKGROUND_TEXTURE_HEIGHT / 2 + yScale*j - yOffset, 
-					BACKGROUND_TEXTURE_WIDTH / 2 + xScale*i - xOffset, -BACKGROUND_TEXTURE_HEIGHT / 2 + yScale*j - yOffset );
-			
-			this.squareVerticesBuffer.numItems += 4;
-		
-			textCoord.push( 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 );
-			this.squareVerticesTextCoorBuffer.numItems += 4;
-			
-			indices.push(4*k, 4*k+1, 4*k+2, 4*k, 4*k+2, 4*k+3);
-			this.squareVerticesIndexBuffer.numItems += 6;
-			k++;
-		}
-	}
+	this.computeGround(vertices, textCoord, indices);
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -67,6 +37,32 @@ Ground.prototype.initGroundMesh = function (){
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices),
 			gl.STATIC_DRAW);
 	
+}
+
+Ground.prototype.computeGround = function (vertices, textCoord, indices) {
+	var xIteration = Math.round(gl.viewportWidth/BACKGROUND_TEXTURE_WIDTH);
+	var yIteration = Math.round(gl.viewportHeight/BACKGROUND_TEXTURE_HEIGHT);
+	
+	var k = 0;
+	
+	for (var i=0; i<=xIteration; i++) {
+		
+		for (var j=0; j<=yIteration; j++) {
+			vertices.push( -BACKGROUND_TEXTURE_WIDTH / 2 + BACKGROUND_TEXTURE_WIDTH*i, -BACKGROUND_TEXTURE_HEIGHT / 2 + BACKGROUND_TEXTURE_HEIGHT*j,
+		            -BACKGROUND_TEXTURE_WIDTH / 2 + BACKGROUND_TEXTURE_WIDTH*i, BACKGROUND_TEXTURE_HEIGHT / 2 + BACKGROUND_TEXTURE_HEIGHT*j, 
+		            BACKGROUND_TEXTURE_WIDTH / 2 + BACKGROUND_TEXTURE_WIDTH*i,	BACKGROUND_TEXTURE_HEIGHT / 2 + BACKGROUND_TEXTURE_HEIGHT*j, 
+					BACKGROUND_TEXTURE_WIDTH / 2 + BACKGROUND_TEXTURE_WIDTH*i, -BACKGROUND_TEXTURE_HEIGHT / 2 + BACKGROUND_TEXTURE_HEIGHT*j);
+			
+			this.squareVerticesBuffer.numItems += 4;
+		
+			textCoord.push( 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 );
+			this.squareVerticesTextCoorBuffer.numItems += 4;
+			
+			indices.push(4*k, 4*k+1, 4*k+2, 4*k, 4*k+2, 4*k+3);
+			this.squareVerticesIndexBuffer.numItems += 6;
+			k++;
+		}
+	}
 }
 
 Ground.prototype.draw = function (){
@@ -82,7 +78,7 @@ Ground.prototype.draw = function (){
     gl.activeTexture(gl.TEXTURE0);
     
 	gl.bindTexture(gl.TEXTURE_2D, this.groundText);
-    gl.uniform2f(samplerUniform, BACKGROUND_TILE_WIDTH, BACKGROUND_TILE_HEIGHT);
+    gl.uniform2f(samplerUniform, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
     

@@ -45,10 +45,8 @@ DynCursor.prototype.initCursorMesh = function (){
 }
 
 DynCursor.prototype.draw = function (){
-	var xTranslation = this.iXGridPos*MAP_TILE_WIDTH;
 	var yTranslation = this.iYGridPos*0.75*MAP_TILE_HEIGHT;
-	
-	xTranslation = this.iXGridPos*MAP_TILE_WIDTH + (this.iYGridPos & 1)*0.5*MAP_TILE_WIDTH;
+	var xTranslation = this.iXGridPos*MAP_TILE_WIDTH + (this.iYGridPos & 1)*0.5*MAP_TILE_WIDTH;
 	
 	gl.uniform2f(translationLocation, xTranslation, yTranslation);
 
