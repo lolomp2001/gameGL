@@ -7,7 +7,7 @@ function DynCursor() {
 	this.iYGridPos;
 }
 
-DynCursor.prototype.initCursorMesh = function (){
+DynCursor.prototype.initMesh = function (){
 	this.squareVerticesBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
 

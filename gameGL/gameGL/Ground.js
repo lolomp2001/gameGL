@@ -5,7 +5,7 @@ function Ground() {
 	this.squareVerticesIndexBuffer;
 }
 
-Ground.prototype.initGroundMesh = function (){
+Ground.prototype.initMesh = function (){
 	
 	
 	this.squareVerticesBuffer = gl.createBuffer();

@@ -6,6 +6,7 @@ var translationLocation;
 var textureLocation;
 var samplerUniform;
 var mousePos = {x : 0, y : 0};
+var mouseClick = {x : 0, y : 0};
 
 function startGameGL() {
 	document.documentElement.style.overflow = 'hidden';
@@ -46,7 +47,13 @@ function startGameGL() {
 		canvas.addEventListener('mousemove', function(evt) {
 			var rect = canvas.getBoundingClientRect();
 			mousePos = getMousePos(canvas, evt);
-			gameGL.unpdateCursor();
+			gameGL.updateCursor();
+			}, false);
+		
+		canvas.addEventListener('click', function(evt) {
+			var rect = canvas.getBoundingClientRect();
+			mouseClick = getMousePos(canvas, evt);
+			gameGL.updateCharacterPosition();
 			}, false);
 		
 		// Set up to draw the scene periodically.
