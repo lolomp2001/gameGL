@@ -3,8 +3,11 @@ function Character() {
 	this.squareVerticesTextCoorBuffer;
 	this.CharacterText;
 	this.squareVerticesIndexBuffer;
-	this.iXDestination = Math.trunc(0.3*canvas.width / MAP_TILE_WIDTH);;
-	this.iYDestination = Math.trunc(0.3*canvas.height / (0.75 * MAP_TILE_HEIGHT));
+	this.iXNextPos = Math.trunc(0.3*canvas.width / MAP_TILE_WIDTH);
+	this.iYNextPos = Math.trunc(0.3*canvas.height / (0.75 * MAP_TILE_HEIGHT))-2;
+	this.iXDestination = this.iXNextPos;
+	this.iYDestination = this.iYNextPos;
+	this.pathArray = [];
 }
 
 Character.prototype.initMesh = function (){
@@ -43,31 +46,45 @@ Character.prototype.initMesh = function (){
 }
 
 Character.prototype.draw = function (){
-	var yTranslation = this.iYDestination*0.75*MAP_TILE_HEIGHT;
-	var xTranslation = this.iXDestination*MAP_TILE_WIDTH + (this.iYDestination & 1)*0.5*MAP_TILE_WIDTH;
-
-	gl.uniform2f(translationLocation, xTranslation, yTranslation);
-
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
-	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.squareVerticesBuffer.itemSize, gl.FLOAT, false, 0, 0);
 	
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.squareVerticesTextCoorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	for (var i=0; i<this.pathArray.length; i++) {
+		var xPos = this.pathArray[i].x;
+		var yPos = this.pathArray[i].y-2;
+		
+		var yTranslation = yPos*0.75*MAP_TILE_HEIGHT;
+		var xTranslation = xPos*MAP_TILE_WIDTH + (yPos & 1)*0.5*MAP_TILE_WIDTH;
 	
-    gl.activeTexture(gl.TEXTURE0);
-    
-	gl.bindTexture(gl.TEXTURE_2D, this.CharacterText);
-    gl.uniform2f(samplerUniform, BACKGROUND_CHARACTER_WIDTH, BACKGROUND_CHARACTER_HEIGHT);
-    
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
-    
-    gl.drawElements(gl.TRIANGLES, this.squareVerticesIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+		gl.uniform2f(translationLocation, xTranslation, yTranslation);
+	
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.squareVerticesBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
+	    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.squareVerticesTextCoorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		
+	    gl.activeTexture(gl.TEXTURE0);
+	    
+		gl.bindTexture(gl.TEXTURE_2D, this.CharacterText);
+	    gl.uniform2f(samplerUniform, BACKGROUND_CHARACTER_WIDTH, BACKGROUND_CHARACTER_HEIGHT);
+	    
+	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
+	    
+	    gl.drawElements(gl.TRIANGLES, this.squareVerticesIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+	}
 
 }
 
 Character.prototype.setCharacterPosition = function (iXDestination, iYDestination){
 	this.iXDestination = iXDestination;
-	this.iYDestination = iYDestination-2;
+	this.iYDestination = iYDestination;
+	
+	var iXMax = Math.trunc(canvas.width / MAP_TILE_WIDTH);
+	var iYMax = Math.trunc(canvas.height / (0.75 * MAP_TILE_HEIGHT));
+	
+	var dijkstra = new Dijkstra();
+	dijkstra.initializeGraph(0, 0, iXMax, iYMax);
+	dijkstra.initializeFirstItem(this.iXNextPos, this.iYNextPos);
+	this.pathArray = dijkstra.getPath(0, 0, iXMax, iYMax, this.iXNextPos, this.iYNextPos, this.iXDestination, this.iYDestination);
 }
 
 Character.prototype.handleLoadedTexture = function (texture) {
