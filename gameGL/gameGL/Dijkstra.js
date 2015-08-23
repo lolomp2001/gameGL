@@ -10,13 +10,13 @@ Dijkstra.prototype.initializeGraph = function (iXMin, iYmin, iXMax, iYMax){
 		this.worldGraph[i] = [];
 		
 		for (var j=iYmin; j<=iYMax; j++) {
-			this.worldGraph[i][j] = {checked: false, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: null};
+			this.worldGraph[i][j] = {checked: false, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: []};
 		}
 	}
 }
 
 Dijkstra.prototype.initializeFirstItem = function (iXNextPos, iYNextPos) {
-	var items = {x: iXNextPos, y: iYNextPos};
+	var items = {x: iXNextPos, y: iYNextPos, weigth: 0};
 	this.itemsList.push(items);
 	
 	this.worldGraph[iXNextPos][iYNextPos] = {checked: false, weigth: 0, parentItem: items};
@@ -39,15 +39,13 @@ Dijkstra.prototype.getPath = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, iY
 		}
 	}
 	
-	console.log(iXDestination,iYDestination);
-	
 	this.pathArray.push(lastItem);
 	
 	var i = iXDestination;
 	var j = iYDestination;
 	
-	while (this.worldGraph[i][j].parentItem.x!=iXNextPos || this.worldGraph[i][j].parentItem.y!=iYNextPos) {
-		var items = {x: this.worldGraph[i][j].parentItem.x, y: this.worldGraph[i][j].parentItem.y};
+	while (this.worldGraph[i][j].parentItem[0].x!=iXNextPos || this.worldGraph[i][j].parentItem[0].y!=iYNextPos) {
+		var items = this.getRandomParent(this.worldGraph[i][j].parentItem);
 		this.pathArray.splice(0, 0, items);
 		
 		i = items.x;
@@ -60,8 +58,8 @@ Dijkstra.prototype.getPath = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, iY
 }
 
 Dijkstra.prototype.checkItem = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, iYNextPos) {
-	var itemsChecked = {x: iXNextPos, y: iYNextPos};
-	this.itemsList.splice(this.indexOfItemsArray(this.itemsList, itemsChecked), 1);
+	var itemChecked = {x: iXNextPos, y: iYNextPos};
+	this.itemsList.splice(this.indexOfItemsArray(this.itemsList, itemChecked), 1);
 	var itemWeigth = this.worldGraph[iXNextPos][iYNextPos].weigth;
 	
 	// sommet 1 sur 6 (-1, -1)
@@ -69,8 +67,9 @@ Dijkstra.prototype.checkItem = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, 
 		var currentWeigth = this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos-1].weigth;
 		this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos-1].weigth = Math.min(DIJKSTRA_DIAG_WEIGTH+itemWeigth,currentWeigth);
 		
-		if (currentWeigth!=this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos-1].weigth) {
-			this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos-1].parentItem = itemsChecked;
+		if (currentWeigth>=this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos-1].weigth) {
+			var newParentItem = {x: iXNextPos, y: iYNextPos, weigth: itemWeigth};
+			this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos-1].parentItem.push(newParentItem);
 		}
 		
 		var items = {x: (iXNextPos-(1-iYNextPos & 1)), y: iYNextPos-1};
@@ -85,8 +84,9 @@ Dijkstra.prototype.checkItem = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, 
 		var currentWeigth = this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos-1].weigth;
 		this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos-1].weigth = Math.min(DIJKSTRA_DIAG_WEIGTH+itemWeigth,currentWeigth);
 		
-		if (currentWeigth!=this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos-1].weigth) {
-			this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos-1].parentItem = itemsChecked;
+		if (currentWeigth>=this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos-1].weigth) {
+			var newParentItem = {x: iXNextPos, y: iYNextPos, weigth: itemWeigth};
+			this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos-1].parentItem.push(newParentItem);
 		}
 		
 		var items = {x: iXNextPos+(iYNextPos & 1), y: iYNextPos-1};
@@ -100,8 +100,9 @@ Dijkstra.prototype.checkItem = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, 
 		var currentWeigth = this.worldGraph[iXNextPos+1][iYNextPos].weigth;
 		this.worldGraph[iXNextPos+1][iYNextPos].weigth = Math.min(DIJKSTRA_SIDE_WEIGTH+itemWeigth,currentWeigth);
 		
-		if (currentWeigth!=this.worldGraph[iXNextPos+1][iYNextPos].weigth) {
-			this.worldGraph[iXNextPos+1][iYNextPos].parentItem = itemsChecked;
+		if (currentWeigth>=this.worldGraph[iXNextPos+1][iYNextPos].weigth) {
+			var newParentItem = {x: iXNextPos, y: iYNextPos, weigth: itemWeigth};
+			this.worldGraph[iXNextPos+1][iYNextPos].parentItem.push(newParentItem);
 		}
 		
 		var items = {x: iXNextPos+1, y: iYNextPos};
@@ -115,8 +116,9 @@ Dijkstra.prototype.checkItem = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, 
 		var currentWeigth = this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos+1].weigth;
 		this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos+1].weigth = Math.min(DIJKSTRA_DIAG_WEIGTH+itemWeigth,currentWeigth);
 		
-		if (currentWeigth!=this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos+1].weigth) {
-			this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos+1].parentItem = itemsChecked;
+		if (currentWeigth>=this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos+1].weigth) {
+			var newParentItem = {x: iXNextPos, y: iYNextPos, weigth: itemWeigth};
+			this.worldGraph[iXNextPos+(iYNextPos & 1)][iYNextPos+1].parentItem.push(newParentItem);
 		}
 		
 		var items = {x: iXNextPos+(iYNextPos & 1), y: iYNextPos+1};
@@ -130,8 +132,9 @@ Dijkstra.prototype.checkItem = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, 
 		var currentWeigth = this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos+1].weigth;
 		this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos+1].weigth = Math.min(DIJKSTRA_DIAG_WEIGTH+itemWeigth,currentWeigth);
 		
-		if (currentWeigth!=this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos+1].weigth) {
-			this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos+1].parentItem = itemsChecked;
+		if (currentWeigth>=this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos+1].weigth) {
+			var newParentItem = {x: iXNextPos, y: iYNextPos, weigth: itemWeigth};
+			this.worldGraph[(iXNextPos-(1-iYNextPos & 1))][iYNextPos+1].parentItem.push(newParentItem);
 		}
 		
 		var items = {x: (iXNextPos-(1-iYNextPos & 1)), y: iYNextPos+1};
@@ -145,8 +148,9 @@ Dijkstra.prototype.checkItem = function (iXMin, iYmin, iXMax, iYMax, iXNextPos, 
 		var currentWeigth = this.worldGraph[iXNextPos-1][iYNextPos].weigth;
 		this.worldGraph[iXNextPos-1][iYNextPos].weigth = Math.min(DIJKSTRA_SIDE_WEIGTH+itemWeigth,currentWeigth);
 		
-		if (currentWeigth!=this.worldGraph[iXNextPos-1][iYNextPos].weigth) {
-			this.worldGraph[iXNextPos-1][iYNextPos].parentItem = itemsChecked;
+		if (currentWeigth>=this.worldGraph[iXNextPos-1][iYNextPos].weigth) {
+			var newParentItem = {x: iXNextPos, y: iYNextPos, weigth: itemWeigth};
+			this.worldGraph[iXNextPos-1][iYNextPos].parentItem.push(newParentItem);
 		}
 		
 		var items = {x: iXNextPos-1, y: iYNextPos};
@@ -169,4 +173,38 @@ Dijkstra.prototype.indexOfItemsArray = function (itemsArray, item) {
 	}
 	
 	return iIndex;
+}
+
+Dijkstra.prototype.getRandomParent = function (parentItems) {
+	parentItems.sort(function(a, b) {
+		
+		if (a.weigth < b.weigth) {
+			return -1;
+		}
+		
+		if (a.weigth > b.weigth) {
+			return 1;
+		}
+		
+		return 0;
+	});
+	
+	var resultParents = [];
+	var minWiegth = parentItems[0].weigth;
+	
+	for (var i=0; i<parentItems.length; i++) {
+		var weigth = parentItems[i].weigth;
+		
+		if (weigth<minWiegth+DIJKSTRA_DIAG_WEIGTH) {
+			resultParents.push(parentItems[i])
+		}
+		
+		else {
+			break;
+		}
+	}
+	
+	var rand = Math.floor(Math.random()*resultParents.length);
+	
+	return resultParents[rand];
 }
