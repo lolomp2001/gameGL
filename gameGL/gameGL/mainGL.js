@@ -59,7 +59,7 @@ function startGameGL() {
 		// Set up to draw the scene periodically.
 		
 		
-		setInterval(function(){gameGL.draw();}, 15);
+		setInterval(function(){gameGL.run();}, 1000/GAME_FPS);
 	}
 }
 

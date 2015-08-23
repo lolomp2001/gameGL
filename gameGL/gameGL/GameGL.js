@@ -8,16 +8,26 @@ function GameGL() {
 	
 	this.character.initMesh();
 	this.character.initTexture();
+	this.character.initPosition()
 	
 	this.cursor.initMesh();
 	this.cursor.initTexture();
 }
 
+GameGL.prototype.run = function (){
+	this.update();
+	this.draw();
+}
+
+GameGL.prototype.update = function (){
+	this.character.updatePosition();
+}
+
 GameGL.prototype.draw = function (){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	this.ground.draw();
-	this.character.draw();
 	this.cursor.draw();
+	this.character.draw();
 }
 
 GameGL.prototype.updateCursor = function (){
