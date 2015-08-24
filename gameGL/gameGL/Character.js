@@ -1,16 +1,23 @@
 function Character() {
-	this.SIDE_SPEED = 3/GAME_FPS;
-	this.DIAG_SPEED;
+	this.SIDE_SPEED = Math.round(100/GAME_FPS)/100;
+	this.DIAG_SPEED = Math.round(10*Math.pow(2, 0.5))/10;
+	this.ANIMATION_RATE = 1/8;
 	this.squareVerticesBuffer;
 	this.squareVerticesTextCoorBuffer;
-	this.CharacterText;
+	this.CurrentCharacterText;
+	this.CharacterText_E;
+	this.CharacterText_SE;
+	this.CharacterText_SW;
+	this.CharacterText_W;
+	this.CharacterText_NW;
+	this.CharacterText_NE;
 	this.squareVerticesIndexBuffer;
 	this.iXCurrentPos = Math.trunc(0.3*canvas.width / MAP_TILE_WIDTH);
 	this.iYCurrentPos = Math.trunc(0.3*canvas.height / (0.75 * MAP_TILE_HEIGHT));
 	this.absXCurrentPos;
 	this.absYCurrentPos
-	this.iXNextPos;
-	this.iYNextPos;
+	this.iXNextPos = this.iXCurrentPos;
+	this.iYNextPos = this.iYCurrentPos;
 	this.xTrans = 0;
 	this.yTrans = 0;
 	this.pathArray = [];
@@ -78,46 +85,81 @@ Character.prototype.updatePosition = function (){
 			this.iNextStep++;
 		}
 	}
-	
+
 	var vectA = Math.sign(absXNextPos-this.absXCurrentPos);
 	var vectB = Math.sign(absYNextPos-this.absYCurrentPos);
 	
-	//cas 1 (-1,-1)
-	if (vectA<0 && vectB<0) {
-		console.log("cas 1");
-		this.xTrans -= 0.1;
-		this.yTrans -= 0.1*MAP_TILE_FACTOR;
-	}
-	//cas 2 (1,-1)
-	else if (vectA>0 && vectB<0) {
-		console.log("cas 2");
-		this.xTrans += 0.1;
-		this.yTrans -= 0.1*MAP_TILE_FACTOR;
-	}
-	//cas 1 (1,0)
-	else if (vectA>0 && vectB==0) {
-		console.log("cas 3");
-		this.xTrans += 0.1;
-	}
-	//cas 1 (1,1)
-	else if (vectA>0 && vectB>0) {
-		console.log("cas 4");
-		this.xTrans += 0.1;
-		this.yTrans += 0.1*MAP_TILE_FACTOR;
-	}
-	//cas 1 (-1,1)
-	else if (vectA<0 && vectB>0) {
-		console.log("cas 5");
-		this.xTrans -= 0.1;
-		this.yTrans += 0.1*MAP_TILE_FACTOR;
-	}
-	//cas 1 (-1,0)
-	else if (vectA<0 && vectB==0) {
-		console.log("cas 6");
-		this.xTrans -= 0.1;
+	if (vectB==0) {
+		this.xTrans += this.SIDE_SPEED*vectA*this.DIAG_SPEED;
+		if (Math.abs(this.xTrans)>=1) {
+			this.xTrans = Math.sign(this.xTrans);
+		}
 	}
 	
-	console.log(vectA, vectB);
+	else {
+		this.xTrans += this.SIDE_SPEED*vectA;
+		this.yTrans += this.SIDE_SPEED*MAP_TILE_FACTOR*vectB;
+		if (Math.abs(this.xTrans)>=1) {
+			this.xTrans = Math.sign(this.xTrans);
+		}
+		
+		else if (Math.abs(this.yTrans)>=1) {
+			this.yTrans = Math.sign(this.yTrans);
+		}
+	}
+}
+
+Character.prototype.updateTexture = function (){
+	var iFrameNumber = 0;
+	
+	//cas 1 (-1,-1)
+	if (this.xTrans<0 && this.yTrans<0) {
+		this.CurrentCharacterText = this.CharacterText_NW;
+		var dist = Math.pow(Math.pow(this.xTrans, 2)+Math.pow(this.yTrans, 2),0.5);
+		iFrameNumber = Math.trunc(dist/this.ANIMATION_RATE);
+		
+	}
+	//cas 2 (1,-1)
+	else if (this.xTrans>0 && this.yTrans<0) {
+		this.CurrentCharacterText = this.CharacterText_NE;
+		var dist = Math.pow(Math.pow(this.xTrans, 2)+Math.pow(this.yTrans, 2),0.5);
+		iFrameNumber = Math.trunc(dist/this.ANIMATION_RATE);
+	}
+	//cas 1 (1,0)
+	else if (this.xTrans>0 && this.yTrans==0) {
+		this.CurrentCharacterText = this.CharacterText_E;
+		iFrameNumber = Math.trunc(this.xTrans/this.ANIMATION_RATE);
+	}
+	//cas 1 (1,1)
+	else if (this.xTrans>0 && this.yTrans>0) {
+		this.CurrentCharacterText = this.CharacterText_SE;
+		var dist = Math.pow(Math.pow(this.xTrans, 2)+Math.pow(this.yTrans, 2),0.5);
+		iFrameNumber = Math.trunc(dist/this.ANIMATION_RATE);
+	}
+	//cas 1 (-1,1)
+	else if (this.xTrans<0 && this.yTrans>0) {
+		this.CurrentCharacterText = this.CharacterText_SW;
+		var dist = Math.pow(Math.pow(this.xTrans, 2)+Math.pow(this.yTrans, 2),0.5);
+		iFrameNumber = Math.trunc(dist/this.ANIMATION_RATE);
+	}
+	//cas 1 (-1,0)
+	else if (this.xTrans<0 && this.yTrans==0) {
+		this.CurrentCharacterText = this.CharacterText_W;
+		iFrameNumber = Math.trunc(this.xTrans/this.ANIMATION_RATE);
+	}
+	
+	var iImageRow = Math.trunc(iFrameNumber/2);
+	var iImageCol = iFrameNumber%2;
+	
+	var textCoord = [ 0.0 + iImageCol / 2, 1.0 - iImageRow / 4,
+			0.0 + iImageCol / 2, 3 / 4 - iImageRow / 4,
+			1 / 2 + iImageCol / 2, 3 / 4 - iImageRow / 4,
+			1 / 2 + iImageCol / 2, 1.0 - iImageRow / 4 ];
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textCoord), gl.STATIC_DRAW);
+
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
 }
 
 Character.prototype.draw = function (){
@@ -131,7 +173,7 @@ Character.prototype.draw = function (){
 		
 	    gl.activeTexture(gl.TEXTURE0);
 	    
-		gl.bindTexture(gl.TEXTURE_2D, this.CharacterText);
+		gl.bindTexture(gl.TEXTURE_2D, this.CurrentCharacterText);
 	    gl.uniform2f(samplerUniform, BACKGROUND_CHARACTER_WIDTH, BACKGROUND_CHARACTER_HEIGHT);
 	    
 	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
@@ -145,8 +187,8 @@ Character.prototype.setCharacterPosition = function (iXDestination, iYDestinatio
 	
 	var dijkstra = new Dijkstra();
 	dijkstra.initializeGraph(0, 0, iXMax, iYMax);
-	dijkstra.initializeFirstItem(this.iXCurrentPos, this.iYCurrentPos);
-	this.pathArray = dijkstra.getPath(0, 0, iXMax, iYMax, this.iXCurrentPos, this.iYCurrentPos, iXDestination, iYDestination);
+	dijkstra.initializeFirstItem(this.iXNextPos, this.iYNextPos);
+	this.pathArray = dijkstra.getPath(0, 0, iXMax, iYMax, this.iXNextPos, this.iYNextPos, iXDestination, iYDestination);
 	
 	this.iNextStep = 0;
 }
@@ -163,6 +205,17 @@ Character.prototype.handleLoadedTexture = function (texture) {
 }
 
 Character.prototype.initTexture = function() {
+	this.CharacterText_E = this.loadTexture("images/character_e.png");
+	this.CurrentCharacterText = this.CharacterText_E;
+	
+	this.CharacterText_SE = this.loadTexture("images/character_se.png");
+	this.CharacterText_SW = this.loadTexture("images/character_sw.png");
+	this.CharacterText_W = this.loadTexture("images/character_w.png");
+	this.CharacterText_NW = this.loadTexture("images/character_nw.png");
+	this.CharacterText_NE = this.loadTexture("images/character_ne.png");
+}
+
+Character.prototype.loadTexture = function(imagePath) {
 	var texture = gl.createTexture();
 	texture.image = new Image();
 
@@ -170,6 +223,6 @@ Character.prototype.initTexture = function() {
 		Character.prototype.handleLoadedTexture(texture);
 	}
 	
-	texture.image.src = "images/character_e.png";
-	this.CharacterText = texture;
+	texture.image.src = imagePath;
+	return texture;
 }

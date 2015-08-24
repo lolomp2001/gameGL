@@ -21,6 +21,7 @@ GameGL.prototype.run = function (){
 
 GameGL.prototype.update = function (){
 	this.character.updatePosition();
+	this.character.updateTexture();
 }
 
 GameGL.prototype.draw = function (){

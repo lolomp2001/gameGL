@@ -26,9 +26,6 @@ Dijkstra.prototype.getPath = function (iXMin, iYmin, iXMax, iYMax, iXStartPos, i
 	var startItem = {x: iXStartPos, y: iYStartPos};
 	var lastItem = {x: iXDestination, y: iYDestination};
 	
-	console.log(startItem);
-	console.log(lastItem);
-
 	if (startItem.x!=lastItem.x || startItem.y!=lastItem.y) {
 		this.checkItem(iXMin, iYmin, iXMax, iYMax, iXStartPos, iYStartPos);
 		
@@ -59,7 +56,8 @@ Dijkstra.prototype.getPath = function (iXMin, iYmin, iXMax, iYMax, iXStartPos, i
 		this.pathArray.push(lastItem);
 	}
 	
-	console.log(this.pathArray);
+	this.pathArray.splice(0, 0, startItem);
+	
 	return this.pathArray;
 }
 
