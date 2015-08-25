@@ -58,7 +58,7 @@ DynCursor.prototype.draw = function (){
 	
     gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.dynCursorText);
-    gl.uniform2f(samplerUniform, MAP_TILE_WIDTH, MAP_TILE_HEIGHT);
+	gl.uniform1i(samplerUniform, 0);
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
     
@@ -92,10 +92,10 @@ DynCursor.prototype.initTexture = function() {
 DynCursor.prototype.moveGroundCursor = function(){
 	var SectX =  Math.trunc(mousePos.x / MAP_TILE_WIDTH);
 	var SectY = Math.trunc(mousePos.y / (0.75 * MAP_TILE_HEIGHT));
-
+	
 	var SectPxlX = (mousePos.x % MAP_TILE_WIDTH);
 	var SectPxlY = (mousePos.y % (0.75 * MAP_TILE_HEIGHT));
-
+	new Blob();
 	this.iXGridPos = SectX;
 	this.iYGridPos = SectY;
 

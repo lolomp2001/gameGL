@@ -1,6 +1,6 @@
 function Character() {
-	this.SIDE_SPEED = Math.round(100/GAME_FPS)/100;
-	this.DIAG_SPEED = Math.round(10*Math.pow(2, 0.5))/10;
+	this.SIDE_SPEED = 1/GAME_FPS;
+	this.DIAG_SPEED = Math.pow(2, 0.5);
 	this.ANIMATION_RATE = 1/8;
 	this.squareVerticesBuffer;
 	this.squareVerticesTextCoorBuffer;
@@ -174,7 +174,7 @@ Character.prototype.draw = function (){
 	    gl.activeTexture(gl.TEXTURE0);
 	    
 		gl.bindTexture(gl.TEXTURE_2D, this.CurrentCharacterText);
-	    gl.uniform2f(samplerUniform, BACKGROUND_CHARACTER_WIDTH, BACKGROUND_CHARACTER_HEIGHT);
+	    gl.uniform1i(samplerUniform, 0);
 	    
 	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
 	    

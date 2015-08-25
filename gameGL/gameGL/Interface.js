@@ -1,31 +1,35 @@
-function Ground() {
+function Interface() {
 	this.squareVerticesBuffer;
 	this.squareVerticesTextCoorBuffer;
-	this.groundText;
+	this.interfaceText;
 	this.squareVerticesIndexBuffer;
+	this.initXPos;
+	this.initYPos;
 }
 
-Ground.prototype.initMesh = function (){
-	
+Interface.prototype.initMesh = function (){
+	this.initXPos = canvas.width;
+	this.initYPos = canvas.height;
 	
 	this.squareVerticesBuffer = gl.createBuffer();
 	
 
-	var vertices = [ ];
+	var vertices = [ -INTERFACE_TEXTURE_WIDTH / 2, -INTERFACE_TEXTURE_HEIGHT / 2,
+	     			-INTERFACE_TEXTURE_WIDTH / 2, INTERFACE_TEXTURE_HEIGHT / 2, 
+	    			INTERFACE_TEXTURE_WIDTH / 2,	INTERFACE_TEXTURE_HEIGHT / 2, 
+	    			INTERFACE_TEXTURE_WIDTH / 2, -INTERFACE_TEXTURE_HEIGHT / 2 ];
 	
 	this.squareVerticesBuffer.itemSize = 2;
-	this.squareVerticesBuffer.numItems = 0;
+	this.squareVerticesBuffer.numItems = 4;
 	
 	this.squareVerticesTextCoorBuffer = gl.createBuffer();
-	var textCoord = [ ];
+	var textCoord = [ 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 ];
 	this.squareVerticesTextCoorBuffer.itemSize = 2;
-	this.squareVerticesTextCoorBuffer.numItems = 0;
+	this.squareVerticesTextCoorBuffer.numItems = 4;
 	
 	this.squareVerticesIndexBuffer = gl.createBuffer();
-	var indices = [ ];
-	this.squareVerticesIndexBuffer.numItems = 0;
-	
-	this.computeGround(vertices, textCoord, indices);
+	var indices = [ 0, 1, 2, 0, 2, 3 ];
+	this.squareVerticesIndexBuffer.numItems = 6;
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -39,35 +43,9 @@ Ground.prototype.initMesh = function (){
 	
 }
 
-Ground.prototype.computeGround = function (vertices, textCoord, indices) {
-	var xIteration = Math.round(gl.viewportWidth/BACKGROUND_TEXTURE_WIDTH);
-	var yIteration = Math.round(gl.viewportHeight/BACKGROUND_TEXTURE_HEIGHT);
-	
-	var k = 0;
-	
-	for (var i=0; i<=xIteration; i++) {
-		
-		for (var j=0; j<=yIteration; j++) {
-			vertices.push( -BACKGROUND_TEXTURE_WIDTH / 2 + BACKGROUND_TEXTURE_WIDTH*i, -BACKGROUND_TEXTURE_HEIGHT / 2 + BACKGROUND_TEXTURE_HEIGHT*j,
-		            -BACKGROUND_TEXTURE_WIDTH / 2 + BACKGROUND_TEXTURE_WIDTH*i, BACKGROUND_TEXTURE_HEIGHT / 2 + BACKGROUND_TEXTURE_HEIGHT*j, 
-		            BACKGROUND_TEXTURE_WIDTH / 2 + BACKGROUND_TEXTURE_WIDTH*i,	BACKGROUND_TEXTURE_HEIGHT / 2 + BACKGROUND_TEXTURE_HEIGHT*j, 
-					BACKGROUND_TEXTURE_WIDTH / 2 + BACKGROUND_TEXTURE_WIDTH*i, -BACKGROUND_TEXTURE_HEIGHT / 2 + BACKGROUND_TEXTURE_HEIGHT*j);
-			
-			this.squareVerticesBuffer.numItems += 4;
-		
-			textCoord.push( 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0 );
-			this.squareVerticesTextCoorBuffer.numItems += 4;
-			
-			indices.push(4*k, 4*k+1, 4*k+2, 4*k, 4*k+2, 4*k+3);
-			this.squareVerticesIndexBuffer.numItems += 6;
-			k++;
-		}
-	}
-}
+Interface.prototype.draw = function (){
 
-Ground.prototype.draw = function (){
-
-	gl.uniform2f(translationLocation, 0, 0);
+	gl.uniform2f(translationLocation, this.initXPos/2, this.initYPos-INTERFACE_TEXTURE_HEIGHT/2);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
 	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.squareVerticesBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -77,7 +55,7 @@ Ground.prototype.draw = function (){
 	
     gl.activeTexture(gl.TEXTURE0);
     
-	gl.bindTexture(gl.TEXTURE_2D, this.groundText);
+	gl.bindTexture(gl.TEXTURE_2D, this.interfaceText);
 	gl.uniform1i(samplerUniform, 0);
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
@@ -86,7 +64,7 @@ Ground.prototype.draw = function (){
 
 }
 
-Ground.prototype.handleLoadedTexture = function (texture) {
+Interface.prototype.handleLoadedTexture = function (texture) {
 
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -97,14 +75,14 @@ Ground.prototype.handleLoadedTexture = function (texture) {
 
 }
 
-Ground.prototype.initTexture = function() {
+Interface.prototype.initTexture = function() {
 	var texture = gl.createTexture();
 	texture.image = new Image();
 
 	texture.image.onload = function() {
-		Ground.prototype.handleLoadedTexture(texture);
+		Interface.prototype.handleLoadedTexture(texture);
 	}
 	
-	texture.image.src = "images/ground.png";
-	this.groundText = texture;
+	texture.image.src = "images/interface.png";
+	this.interfaceText = texture;
 }

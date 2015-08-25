@@ -39,7 +39,7 @@ varying vec2 vTextureCoord;
 uniform sampler2D uSampler;
 
 void main(void) {
-	gl_FragColor = texture2D(uSampler, vTextureCoord);
+	gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
 }
 </script>
 
@@ -50,6 +50,7 @@ void main(void) {
 <script type="text/javascript" src="Dijkstra.js"></script>
 <script type="text/javascript" src="Character.js"></script>
 <script type="text/javascript" src="DynCursor.js"></script>
+<script type="text/javascript" src="Interface.js"></script>
 
 <title>BaseGL</title>
 </head>
