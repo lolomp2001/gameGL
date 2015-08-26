@@ -23,6 +23,11 @@ function startGameGL() {
 	
 	canvas.initialWidth = canvas.width;
 	canvas.initialHeight = canvas.height;
+	
+	var binData = document.getElementById("divA");
+	binData.style.top = canvas.style.top;
+	binData.style.position = "relative";
+	binData.style.textAlign = "center";
 
 	initWebGL(canvas); // Initialise le contexte WebGL
 
@@ -43,6 +48,8 @@ function startGameGL() {
 
 		
 		var gameGL = new GameGL();
+		
+		var builder = new Builder();
 
 		canvas.addEventListener('mousemove', function(evt) {
 			var rect = canvas.getBoundingClientRect();
@@ -53,7 +60,8 @@ function startGameGL() {
 		canvas.addEventListener('click', function(evt) {
 			var rect = canvas.getBoundingClientRect();
 			mouseClick = getMousePos(canvas, evt);
-			gameGL.updateCharacterPosition();
+			//gameGL.updateCharacterPosition();
+			gameGL.click();
 			}, false);
 		
 		// Set up to draw the scene periodically.
