@@ -45,6 +45,10 @@ StatCursor.prototype.initMesh = function (){
 
 }
 
+StatCursor.prototype.setGridPosArray = function (iGridPosArray){
+	this.iGridPosArray = iGridPosArray;
+}
+
 StatCursor.prototype.drawArray = function (){
 	
 	for (var i=0; i<this.iGridPosArray.length; i++) {
@@ -192,6 +196,7 @@ StatCursor.prototype.moveGroundCursor = function(){
 StatCursor.prototype.addPosition = function (){
 	var item = {x: this.iXGridPos, y: this.iYGridPos};
 	var index = Dijkstra.prototype.indexOfItemsArray(this.iGridPosArray, item);
+	
 	if (index<0) {
 		this.iGridPosArray.push(item);
 	}
@@ -199,4 +204,8 @@ StatCursor.prototype.addPosition = function (){
 	else {
 		this.iGridPosArray.splice(index, 1);
 	}
+}
+
+StatCursor.prototype.exportGridPosArray = function (){
+	return this.iGridPosArray;
 }

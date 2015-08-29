@@ -1,17 +1,29 @@
 function Builder() {
+	this.arrayData = [];
 }
 
-Builder.prototype.exportBinary = function(data) {
-	
+Builder.prototype.exportData = function(arrayData) {
+	var serializedArr = JSON.stringify(arrayData);
+	this.downloadData(serializedArr);
 }
 
-Builder.prototype.downloadBinary = function(binData) {
-	var blob = new Blob(binData, {type : "application/octet-binary"});
+Builder.prototype.downloadData = function(data) {
+	var blob = new Blob([data], {type : "application/json"});
 	
-	var aElement = document.getElementById("binData");
+	var aElement = document.getElementById("data");
 	var url = URL.createObjectURL(blob);
 	aElement.href = url;
-	aElement.name = "binData";
+	aElement.name = "mapData.raw";
 	aElement.download = aElement.name;
-	aElement.innerHTML = aElement.name;
+	aElement.innerHTML = "mapData";
+}
+
+Builder.prototype.loadData = function (dataFile) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET","data/"+dataFile, false);
+	xhr.send(null);
+	var serializedArr = xhr.responseText;
+	var arrayData = JSON.parse(serializedArr);
+	
+	return arrayData;
 }
