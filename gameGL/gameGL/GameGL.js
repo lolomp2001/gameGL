@@ -1,4 +1,5 @@
 function GameGL() {
+	this.gridPosArray = [];
 	this.ground = new Ground();
 	this.character = new Character();
 	this.cursor = new DynCursor();
@@ -38,8 +39,17 @@ GameGL.prototype.draw = function (){
 
 GameGL.prototype.updateCursor = function (){
 	this.cursor.moveGroundCursor();
+	this.cursor.updateTexture(this.gridPosArray);
 }
 
 GameGL.prototype.updateCharacterPosition = function (){
 	this.character.setCharacterPosition(this.cursor.iXGridPos, this.cursor.iYGridPos);
+}
+
+GameGL.prototype.loadData = function () {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET","data/mapData.raw", false);
+	xhr.send(null);
+	var serializedArr = xhr.responseText;
+	this.gridPosArray = JSON.parse(serializedArr);
 }

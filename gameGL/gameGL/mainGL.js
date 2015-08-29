@@ -43,6 +43,7 @@ function startGameGL() {
 
 		
 		var gameGL = new GameGL();
+		gameGL.loadData();
 
 		canvas.addEventListener('mousemove', function(evt) {
 			var rect = canvas.getBoundingClientRect();

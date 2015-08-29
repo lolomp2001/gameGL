@@ -2,7 +2,9 @@ function DynCursor() {
 	this.squareVerticesBuffer;
 	this.squareVerticesTextCoorBuffer;
 	this.squareVerticesIndexBuffer;
-	this.dynCursorText;
+	this.dynCursorCurrentText;
+	this.dynCursorTextOK;
+	this.dynCursorTextKO;
 	this.iXGridPos;
 	this.iYGridPos;
 }
@@ -57,13 +59,24 @@ DynCursor.prototype.draw = function (){
     gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.squareVerticesTextCoorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 	
     gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, this.dynCursorText);
+	gl.bindTexture(gl.TEXTURE_2D, this.dynCursorCurrentText);
 	gl.uniform1i(samplerUniform, 0);
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
     
     gl.drawElements(gl.TRIANGLES, this.squareVerticesIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 	
+}
+
+DynCursor.prototype.updateTexture = function (itemsArray) {
+	var item = {x: this.iXGridPos, y: this.iYGridPos};
+	if (Dijkstra.prototype.indexOfItemsArray(itemsArray, item)<0) {
+		this.dynCursorCurrentText = this.dynCursorTextOK;
+	}
+	
+	else {
+		this.dynCursorCurrentText = this.dynCursorTextKO;
+	}
 }
 
 DynCursor.prototype.handleLoadedTexture = function (texture) {
@@ -78,15 +91,22 @@ DynCursor.prototype.handleLoadedTexture = function (texture) {
 }
 
 DynCursor.prototype.initTexture = function() {
+	this.dynCursorTextOK = this.loadTexture("images/dynCursor.png");
+	this.dynCursorCurrentText = this.dynCursorTextOK;
+	
+	this.dynCursorTextKO = this.loadTexture("");
+}
+
+DynCursor.prototype.loadTexture = function(imagePath) {
 	var texture = gl.createTexture();
 	texture.image = new Image();
 
 	texture.image.onload = function() {
-		DynCursor.prototype.handleLoadedTexture(texture);
+		Character.prototype.handleLoadedTexture(texture);
 	}
 	
-	texture.image.src = "images/dynCursor.png";
-	this.dynCursorText = texture;
+	texture.image.src = imagePath;
+	return texture;
 }
 
 DynCursor.prototype.moveGroundCursor = function(){
