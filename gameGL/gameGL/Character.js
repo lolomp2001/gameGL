@@ -58,14 +58,9 @@ Character.prototype.initMesh = function (){
 }
 
 Character.prototype.initPosition = function (gridPosArray) {
-	var iXMax = Math.round(canvas.initialWidth / MAP_TILE_WIDTH);
-	var iYMax = Math.round(canvas.initialWidth / (0.75 * MAP_TILE_HEIGHT));
-	
-	this.dijkstra.init(0, 0, iXMax, iYMax, gridPosArray);
-	
 	this.absXCurrentPos = (this.iXCurrentPos + this.xTrans)*MAP_TILE_WIDTH + ((this.iYCurrentPos) & 1)*0.5*MAP_TILE_WIDTH;
 	this.absXCurrentPos = (this.iYCurrentPos + this.yTrans)*0.75*MAP_TILE_HEIGHT;
-	this.setCharacterPosition(this.iXCurrentPos, this.iYCurrentPos);
+	this.setCharacterPosition(this.iXCurrentPos, this.iYCurrentPos, gridPosArray);
 }
 
 Character.prototype.updatePosition = function (){
@@ -184,11 +179,11 @@ Character.prototype.draw = function (){
 	    gl.drawElements(gl.TRIANGLES, this.squareVerticesIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 }
 
-Character.prototype.setCharacterPosition = function (iXDestination, iYDestination){
+Character.prototype.setCharacterPosition = function (iXDestination, iYDestination, gridPosArray){
 	var iXMax = Math.round(canvas.initialWidth / MAP_TILE_WIDTH);
 	var iYMax = Math.round(canvas.initialWidth / (0.75 * MAP_TILE_HEIGHT));
 	
-	this.dijkstra.initializeGraph();
+	this.dijkstra.initializeGraph(0, 0, iXMax, iYMax, gridPosArray);
 	this.dijkstra.initializeFirstItem(this.iXNextPos, this.iYNextPos);
 	this.pathArray = this.dijkstra.getPath(0, 0, iXMax, iYMax, this.iXNextPos, this.iYNextPos, iXDestination, iYDestination);
 	

@@ -1,33 +1,28 @@
 function Dijkstra() {
-	this.worldGraphInit = [[]];
 	this.worldGraph = [[]];
 	this.pathArray = [];
 	this.itemsList = [];
 }
 
-Dijkstra.prototype.init = function (iXMin, iYmin, iXMax, iYMax, gridPosArray){
+Dijkstra.prototype.initializeGraph = function (iXMin, iYmin, iXMax, iYMax, gridPosArray){
+	this.pathArray = [];
+	this.itemsList = [];
 	
 	for (var i=iXMin; i<=iXMax; i++) {
-		this.worldGraphInit[i] = [];
+		this.worldGraph[i] = [];
 		
 		for (var j=iYmin; j<=iYMax; j++) {
 			var item = {x: i, y: j};
 			
 			if(this.indexOfItemsArray(gridPosArray, item)<0) {
-				this.worldGraphInit[i][j] = {checked: false, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: []};
+				this.worldGraph[i][j] = {checked: false, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: []};
 			}
 			
 			else {
-				this.worldGraphInit[i][j] = {checked: true, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: []};
+				this.worldGraph[i][j] = {checked: true, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: []};
 			}
 		}
 	}
-}
-
-Dijkstra.prototype.initializeGraph = function (){
-	this.worldGraph = this.copyArray(this.worldGraphInit);
-	this.pathArray = [];
-	this.itemsList = [];
 }
 
 Dijkstra.prototype.initializeFirstItem = function (iXStartPos, iYStartPos) {
@@ -80,7 +75,7 @@ Dijkstra.prototype.checkItem = function (iXMin, iYmin, iXMax, iYMax, iXStartPos,
 	var itemChecked = {x: iXStartPos, y: iYStartPos};
 	this.itemsList.splice(this.indexOfItemsArray(this.itemsList, itemChecked), 1);
 	var itemWeigth = this.worldGraph[iXStartPos][iYStartPos].weigth;
-	
+
 	// sommet 1 sur 6 (-1, -1)
 	if ((iXStartPos-(1-iYStartPos & 1))>=iXMin && (iYStartPos-1)>=iYmin && !this.worldGraph[(iXStartPos-(1-iYStartPos & 1))][iYStartPos-1].checked) {
 		var currentWeigth = this.worldGraph[(iXStartPos-(1-iYStartPos & 1))][iYStartPos-1].weigth;
@@ -191,20 +186,6 @@ Dijkstra.prototype.indexOfItemsArray = function (itemsArray, item) {
 		}
 	}
 	return iIndex;
-}
-
-Dijkstra.prototype.copyArray = function (array) {
-	var copyOfArray = [[]];
-	
-	for (var i=0; i<array.length; i++) {
-		var row = array[i];
-		copyOfArray[i] = []; 
-		for (var j=0; j<row.length; j++) {
-			copyOfArray[i][j] = JSON.parse(JSON.stringify(row[i]));
-		}
-	}
-	
-	return copyOfArray;
 }
 
 Dijkstra.prototype.getRandomParent = function (parentItems) {

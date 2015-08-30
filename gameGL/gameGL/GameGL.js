@@ -14,7 +14,7 @@ function GameGL() {
 	
 	this.character.initMesh();
 	this.character.initTexture();
-	this.character.initPosition(this.gridPosArray)
+	this.character.initPosition(this.gridPosArray);
 	
 	this.cursor.initMesh();
 	this.cursor.initTexture();
@@ -83,7 +83,7 @@ GameGL.prototype.click = function (){
 }
 
 GameGL.prototype.updateCharacterPosition = function (){
-	this.character.setCharacterPosition(this.cursor.iXGridPos, this.cursor.iYGridPos);
+	this.character.setCharacterPosition(this.cursor.iXGridPos, this.cursor.iYGridPos, this.gridPosArray);
 }
 
 GameGL.prototype.loadData = function () {
