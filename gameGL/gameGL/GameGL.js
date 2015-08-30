@@ -2,6 +2,7 @@ function GameGL() {
 	this.iGridPosArray;
 	this.builder = new Builder();
 	this.ground = new Ground();
+	this.scenery = new Scenery();
 	//this.character = new Character();
 	//this.cursor = new DynCursor();
 	this.statCursor = new StatCursor();
@@ -9,6 +10,9 @@ function GameGL() {
 	
 	this.ground.initMesh();
 	this.ground.initTexture();
+	
+	this.scenery.initMesh();
+	this.scenery.initTexture();
 	
 //	this.character.initMesh();
 //	this.character.initTexture();
@@ -37,6 +41,7 @@ GameGL.prototype.update = function (){
 GameGL.prototype.draw = function (){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	this.ground.draw();
+	this.scenery.draw();
 	this.playerInterface.draw();
 	//this.cursor.draw();
 	this.statCursor.draw();
