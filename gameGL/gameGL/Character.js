@@ -18,6 +18,7 @@ function Character() {
 	this.absYCurrentPos
 	this.iXNextPos = this.iXCurrentPos;
 	this.iYNextPos = this.iYCurrentPos;
+	this.dijkstra = new Dijkstra();
 	this.xTrans = 0;
 	this.yTrans = 0;
 	this.pathArray = [];
@@ -25,10 +26,7 @@ function Character() {
 }
 
 Character.prototype.initMesh = function (){
-	
-	
 	this.squareVerticesBuffer = gl.createBuffer();
-	
 
 	var vertices = [ -BACKGROUND_CHARACTER_WIDTH / 4, -BACKGROUND_CHARACTER_HEIGHT / 8,
 	     			-BACKGROUND_CHARACTER_WIDTH / 4, BACKGROUND_CHARACTER_HEIGHT / 8, 
@@ -59,7 +57,12 @@ Character.prototype.initMesh = function (){
 	
 }
 
-Character.prototype.initPosition = function () {
+Character.prototype.initPosition = function (gridPosArray) {
+	var iXMax = Math.round(canvas.initialWidth / MAP_TILE_WIDTH);
+	var iYMax = Math.round(canvas.initialWidth / (0.75 * MAP_TILE_HEIGHT));
+	
+	this.dijkstra.init(0, 0, iXMax, iYMax, gridPosArray);
+	
 	this.absXCurrentPos = (this.iXCurrentPos + this.xTrans)*MAP_TILE_WIDTH + ((this.iYCurrentPos) & 1)*0.5*MAP_TILE_WIDTH;
 	this.absXCurrentPos = (this.iYCurrentPos + this.yTrans)*0.75*MAP_TILE_HEIGHT;
 	this.setCharacterPosition(this.iXCurrentPos, this.iYCurrentPos);
@@ -185,10 +188,9 @@ Character.prototype.setCharacterPosition = function (iXDestination, iYDestinatio
 	var iXMax = Math.round(canvas.initialWidth / MAP_TILE_WIDTH);
 	var iYMax = Math.round(canvas.initialWidth / (0.75 * MAP_TILE_HEIGHT));
 	
-	var dijkstra = new Dijkstra();
-	dijkstra.initializeGraph(0, 0, iXMax, iYMax);
-	dijkstra.initializeFirstItem(this.iXNextPos, this.iYNextPos);
-	this.pathArray = dijkstra.getPath(0, 0, iXMax, iYMax, this.iXNextPos, this.iYNextPos, iXDestination, iYDestination);
+	this.dijkstra.initializeGraph();
+	this.dijkstra.initializeFirstItem(this.iXNextPos, this.iYNextPos);
+	this.pathArray = this.dijkstra.getPath(0, 0, iXMax, iYMax, this.iXNextPos, this.iYNextPos, iXDestination, iYDestination);
 	
 	this.iNextStep = 0;
 }

@@ -1,18 +1,33 @@
 function Dijkstra() {
+	this.worldGraphInit = [[]];
 	this.worldGraph = [[]];
 	this.pathArray = [];
 	this.itemsList = [];
 }
 
-Dijkstra.prototype.initializeGraph = function (iXMin, iYmin, iXMax, iYMax){
+Dijkstra.prototype.init = function (iXMin, iYmin, iXMax, iYMax, gridPosArray){
 	
 	for (var i=iXMin; i<=iXMax; i++) {
-		this.worldGraph[i] = [];
+		this.worldGraphInit[i] = [];
 		
 		for (var j=iYmin; j<=iYMax; j++) {
-			this.worldGraph[i][j] = {checked: false, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: []};
+			var item = {x: i, y: j};
+			
+			if(this.indexOfItemsArray(gridPosArray, item)<0) {
+				this.worldGraphInit[i][j] = {checked: false, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: []};
+			}
+			
+			else {
+				this.worldGraphInit[i][j] = {checked: true, weigth: DIJKSTRA_INFINITE_WEIGTH, parentItem: []};
+			}
 		}
 	}
+}
+
+Dijkstra.prototype.initializeGraph = function (){
+	this.worldGraph = this.copyArray(this.worldGraphInit);
+	this.pathArray = [];
+	this.itemsList = [];
 }
 
 Dijkstra.prototype.initializeFirstItem = function (iXStartPos, iYStartPos) {
@@ -176,6 +191,20 @@ Dijkstra.prototype.indexOfItemsArray = function (itemsArray, item) {
 		}
 	}
 	return iIndex;
+}
+
+Dijkstra.prototype.copyArray = function (array) {
+	var copyOfArray = [[]];
+	
+	for (var i=0; i<array.length; i++) {
+		var row = array[i];
+		copyOfArray[i] = []; 
+		for (var j=0; j<row.length; j++) {
+			copyOfArray[i][j] = JSON.parse(JSON.stringify(row[i]));
+		}
+	}
+	
+	return copyOfArray;
 }
 
 Dijkstra.prototype.getRandomParent = function (parentItems) {

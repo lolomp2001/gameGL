@@ -7,12 +7,14 @@ function GameGL() {
 	this.interfaceCursor = new InterfaceCursor();
 	this.playerInterface = new Interface();
 	
+	this.loadData();
+	
 	this.ground.initMesh();
 	this.ground.initTexture();
 	
 	this.character.initMesh();
 	this.character.initTexture();
-	this.character.initPosition()
+	this.character.initPosition(this.gridPosArray)
 	
 	this.cursor.initMesh();
 	this.cursor.initTexture();

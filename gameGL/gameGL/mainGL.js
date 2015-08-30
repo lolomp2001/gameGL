@@ -43,7 +43,6 @@ function startGameGL() {
 
 		
 		var gameGL = new GameGL();
-		gameGL.loadData();
 		
 		window.addEventListener('keydown', function (evt) {
 			if (evt.keyCode == 70) {
