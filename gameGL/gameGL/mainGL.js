@@ -14,8 +14,8 @@ function startGameGL() {
 	
 	canvas = document.getElementById("gameGL");
 	
-	canvas.width=0.9*window.innerWidth;
-	canvas.height=0.9*window.innerHeight;
+	canvas.width=1920;
+	canvas.height=1080;
 	canvas.style.left = 0.08*window.innerWidth/2 +"px";
 	canvas.style.top = 0.08*window.innerHeight/2 +"px";
 	canvas.style.position = "relative";
@@ -44,22 +44,42 @@ function startGameGL() {
 		
 		var gameGL = new GameGL();
 		gameGL.loadData();
+		
+		window.addEventListener('keydown', function (evt) {
+			if (evt.keyCode == 70) {
+				var div = document.getElementById("divFullScreen");
+
+				if (div.requestFullscreen) {
+					div.requestFullscreen();
+					
+				}
+				
+				else if (div.mozRequestFullScreen) {
+					div.mozRequestFullScreen();
+				}
+
+				else if (div.webkitRequestFullScreen) {
+					div.webkitRequestFullscreen();
+				}
+			}
+		}, false);
 
 		canvas.addEventListener('mousemove', function(evt) {
 			var rect = canvas.getBoundingClientRect();
 			mousePos = getMousePos(canvas, evt);
-			gameGL.updateCursor();
+			gameGL.mouseMove();
 			}, false);
 		
 		canvas.addEventListener('click', function(evt) {
 			var rect = canvas.getBoundingClientRect();
 			mouseClick = getMousePos(canvas, evt);
-			gameGL.updateCharacterPosition();
+			gameGL.click();
 			}, false);
 		
+		//set resolution fit to browser
+		resize();
+		
 		// Set up to draw the scene periodically.
-		
-		
 		setInterval(function(){gameGL.run();}, 1000/GAME_FPS);
 	}
 }
@@ -172,10 +192,20 @@ function getShader(gl, id) {
 
 function resize() {
 	var canvas = document.getElementById("gameGL");
-	canvas.width=0.9*window.innerWidth;
-	canvas.height=0.9*window.innerHeight;
-	canvas.style.left = 0.08*window.innerWidth/2 +"px";
-	canvas.style.top = 0.08*window.innerHeight/2 +"px";
+
+	if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+		canvas.width = canvas.initialWidth;
+		canvas.height = canvas.initialHeight;
+		canvas.style.left = 0 + "px";
+		canvas.style.top = 0 + "px";
+	}
+	
+	else {
+		canvas.width=0.9*window.innerWidth;
+		canvas.height=0.9*window.innerHeight;
+		canvas.style.left = 0.08*window.innerWidth/2 +"px";
+		canvas.style.top = 0.08*window.innerHeight/2 +"px";
+	}
 	
 	gl.viewportWidth = canvas.width;
     gl.viewportHeight = canvas.height;

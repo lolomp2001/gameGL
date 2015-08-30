@@ -175,7 +175,6 @@ Dijkstra.prototype.indexOfItemsArray = function (itemsArray, item) {
 			break;
 		}
 	}
-	
 	return iIndex;
 }
 

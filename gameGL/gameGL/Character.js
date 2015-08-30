@@ -182,8 +182,8 @@ Character.prototype.draw = function (){
 }
 
 Character.prototype.setCharacterPosition = function (iXDestination, iYDestination){
-	var iXMax = Math.round(canvas.width / MAP_TILE_WIDTH);
-	var iYMax = Math.round(canvas.height / (0.75 * MAP_TILE_HEIGHT));
+	var iXMax = Math.round(canvas.initialWidth / MAP_TILE_WIDTH);
+	var iYMax = Math.round(canvas.initialWidth / (0.75 * MAP_TILE_HEIGHT));
 	
 	var dijkstra = new Dijkstra();
 	dijkstra.initializeGraph(0, 0, iXMax, iYMax);

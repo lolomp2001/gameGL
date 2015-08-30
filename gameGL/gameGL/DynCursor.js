@@ -70,6 +70,7 @@ DynCursor.prototype.draw = function (){
 
 DynCursor.prototype.updateTexture = function (itemsArray) {
 	var item = {x: this.iXGridPos, y: this.iYGridPos};
+
 	if (Dijkstra.prototype.indexOfItemsArray(itemsArray, item)<0) {
 		this.dynCursorCurrentText = this.dynCursorTextOK;
 	}
@@ -77,6 +78,21 @@ DynCursor.prototype.updateTexture = function (itemsArray) {
 	else {
 		this.dynCursorCurrentText = this.dynCursorTextKO;
 	}
+}
+
+DynCursor.prototype.isClickable = function (itemsArray) {
+	var bResult = true;
+	var item = {x: this.iXGridPos, y: this.iYGridPos};
+
+	if (Dijkstra.prototype.indexOfItemsArray(itemsArray, item)<0) {
+		bResult = true;
+	}
+	
+	else {
+		bResult = false;
+	}
+	
+	return bResult;
 }
 
 DynCursor.prototype.handleLoadedTexture = function (texture) {
@@ -91,10 +107,10 @@ DynCursor.prototype.handleLoadedTexture = function (texture) {
 }
 
 DynCursor.prototype.initTexture = function() {
-	this.dynCursorTextOK = this.loadTexture("images/dynCursor.png");
+	this.dynCursorTextOK = this.loadTexture("images/cursorOK.png");
 	this.dynCursorCurrentText = this.dynCursorTextOK;
 	
-	this.dynCursorTextKO = this.loadTexture("");
+	this.dynCursorTextKO = this.loadTexture("images/cursorKO.png");
 }
 
 DynCursor.prototype.loadTexture = function(imagePath) {

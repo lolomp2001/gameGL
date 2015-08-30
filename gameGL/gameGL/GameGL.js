@@ -1,8 +1,10 @@
 function GameGL() {
-	this.gridPosArray = [];
+	this.gridPosArray;
+	this.bMouseOnInterface = false;
 	this.ground = new Ground();
 	this.character = new Character();
 	this.cursor = new DynCursor();
+	this.interfaceCursor = new InterfaceCursor();
 	this.playerInterface = new Interface();
 	
 	this.ground.initMesh();
@@ -14,6 +16,9 @@ function GameGL() {
 	
 	this.cursor.initMesh();
 	this.cursor.initTexture();
+	
+	this.interfaceCursor.initMesh();
+	this.interfaceCursor.initTexture();
 	
 	this.playerInterface.initMesh();
 	this.playerInterface.initTexture();
@@ -32,14 +37,47 @@ GameGL.prototype.update = function (){
 GameGL.prototype.draw = function (){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	this.ground.draw();
-	this.playerInterface.draw();
-	this.cursor.draw();
+
+	if (!this.bMouseOnInterface) {
+		this.cursor.draw();
+	}
+	
 	this.character.draw();
+	this.playerInterface.draw();
+	
+	if (this.bMouseOnInterface) {
+		this.interfaceCursor.draw();
+	}
+}
+
+GameGL.prototype.mouseMove = function (){
+	this.updateCursor();
+	this.bMouseOnInterface = this.mouseOnInterface();
 }
 
 GameGL.prototype.updateCursor = function (){
 	this.cursor.moveGroundCursor();
 	this.cursor.updateTexture(this.gridPosArray);
+}
+
+GameGL.prototype.mouseOnInterface = function (){
+	var rectInterface = this.playerInterface.getInterfaceRect();
+	var bMouseOnInterface = false;
+	if (mousePos.x<rectInterface.xMax && mousePos.x>rectInterface.xMin && mousePos.y<rectInterface.yMax && mousePos.y>rectInterface.yMin) {
+		bMouseOnInterface = true;
+	}
+	
+	else {
+		bMouseOnInterface = false;
+	}
+	
+	return bMouseOnInterface;
+}
+
+GameGL.prototype.click = function (){
+	if (this.cursor.isClickable(this.gridPosArray)) {
+		this.updateCharacterPosition();
+	}
 }
 
 GameGL.prototype.updateCharacterPosition = function (){
