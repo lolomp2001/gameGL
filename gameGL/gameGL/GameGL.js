@@ -2,6 +2,7 @@ function GameGL() {
 	this.gridPosArray;
 	this.bMouseOnInterface = false;
 	this.ground = new Ground();
+	this.scenery = new Scenery();
 	this.character = new Character();
 	this.cursor = new DynCursor();
 	this.interfaceCursor = new InterfaceCursor();
@@ -11,6 +12,9 @@ function GameGL() {
 	
 	this.ground.initMesh();
 	this.ground.initTexture();
+	
+	this.scenery.initMesh();
+	this.scenery.initTexture();
 	
 	this.character.initMesh();
 	this.character.initTexture();
@@ -39,6 +43,7 @@ GameGL.prototype.update = function (){
 GameGL.prototype.draw = function (){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	this.ground.draw();
+	this.scenery.draw();
 
 	if (!this.bMouseOnInterface) {
 		this.cursor.draw();
