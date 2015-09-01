@@ -193,8 +193,8 @@ function resize() {
 	var canvas = document.getElementById("gameGL");
 
 	if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
-		canvas.width = canvas.initialWidth;
-		canvas.height = canvas.initialHeight;
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
 		canvas.style.left = 0 + "px";
 		canvas.style.top = 0 + "px";
 	}
