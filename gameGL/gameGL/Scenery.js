@@ -14,10 +14,10 @@ Scenery.prototype.initMesh = function (){
 	this.squareVerticesBuffer = gl.createBuffer();
 	
 
-	var vertices = [ -CAR_TEXTURE_WIDTH / 2, -CAR_TEXTURE_HEIGHT / 2,
-	     			-CAR_TEXTURE_WIDTH / 2, CAR_TEXTURE_HEIGHT / 2, 
-	     			CAR_TEXTURE_WIDTH / 2,	CAR_TEXTURE_HEIGHT / 2, 
-	     			CAR_TEXTURE_WIDTH / 2, -CAR_TEXTURE_HEIGHT / 2 ];
+	var vertices = [ -SCENERY_TEXTURE_WIDTH / 2, -SCENERY_TEXTURE_HEIGHT / 2,
+	     			-SCENERY_TEXTURE_WIDTH / 2, SCENERY_TEXTURE_HEIGHT / 2, 
+	     			SCENERY_TEXTURE_WIDTH / 2,	SCENERY_TEXTURE_HEIGHT / 2, 
+	     			SCENERY_TEXTURE_WIDTH / 2, -SCENERY_TEXTURE_HEIGHT / 2 ];
 	
 	this.squareVerticesBuffer.itemSize = 2;
 	this.squareVerticesBuffer.numItems = 4;
@@ -83,6 +83,6 @@ Scenery.prototype.initTexture = function() {
 		Scenery.prototype.handleLoadedTexture(texture);
 	}
 	
-	texture.image.src = "images/car.png";
+	texture.image.src = "images/scenery.png";
 	this.sceneryText = texture;
 }
