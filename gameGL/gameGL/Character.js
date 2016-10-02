@@ -59,7 +59,7 @@ Character.prototype.initMesh = function (){
 
 Character.prototype.initPosition = function (gridPosArray) {
 	this.absXCurrentPos = (this.iXCurrentPos + this.xTrans)*MAP_TILE_WIDTH + ((this.iYCurrentPos) & 1)*0.5*MAP_TILE_WIDTH;
-	this.absXCurrentPos = (this.iYCurrentPos + this.yTrans)*0.75*MAP_TILE_HEIGHT;
+	this.absYCurrentPos = (this.iYCurrentPos + this.yTrans)*0.75*MAP_TILE_HEIGHT;
 	this.setCharacterPosition(this.iXCurrentPos, this.iYCurrentPos, gridPosArray);
 }
 
@@ -195,8 +195,8 @@ Character.prototype.handleLoadedTexture = function (texture) {
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,	texture.image);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 
 }
