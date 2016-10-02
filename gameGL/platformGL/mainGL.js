@@ -5,14 +5,12 @@ var resolutionLocation;
 var translationLocation;
 var textureLocation;
 var samplerUniform;
-var mousePos = {x : 0, y : 0};
-var mouseClick = {x : 0, y : 0};
 
 function startGameGL() {
 	document.documentElement.style.overflow = 'hidden';
 	window.addEventListener('resize', resize, false);
 	
-	canvas = document.getElementById("gameGL");
+	canvas = document.getElementById("platformGL");
 	
 	canvas.width=1920;
 	canvas.height=1080;
@@ -63,32 +61,12 @@ function startGameGL() {
 			}
 		}, false);
 
-		canvas.addEventListener('mousemove', function(evt) {
-			var rect = canvas.getBoundingClientRect();
-			mousePos = getMousePos(canvas, evt);
-			gameGL.mouseMove();
-			}, false);
-		
-		canvas.addEventListener('click', function(evt) {
-			var rect = canvas.getBoundingClientRect();
-			mouseClick = getMousePos(canvas, evt);
-			gameGL.click();
-			}, false);
-		
 		//set resolution fit to browser
 		resize();
 		
 		// Set up to draw the scene periodically.
 		setInterval(function(){gameGL.run();}, 1000/GAME_FPS);
 	}
-}
-
-function getMousePos(canvas, evt) {
-	var rect = canvas.getBoundingClientRect();
-	return {
-		x : (evt.clientX - rect.left)*canvas.initialWidth/canvas.width,
-		y : (evt.clientY - rect.top)*canvas.initialHeight/canvas.height
-	};
 }
 
 function initWebGL(canvas) {
@@ -190,7 +168,7 @@ function getShader(gl, id) {
 }
 
 function resize() {
-	var canvas = document.getElementById("gameGL");
+	var canvas = document.getElementById("platformGL");
 
 	if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
 		canvas.width = window.innerWidth;

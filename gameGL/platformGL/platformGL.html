@@ -32,7 +32,7 @@ void main() {
 </script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
-precision mediump float;
+precision highp float;
 
 varying vec2 vTextureCoord;
 
@@ -45,18 +45,13 @@ void main(void) {
 
 <script type="text/javascript" src="Consts.js"></script>
 <script type="text/javascript" src="mainGL.js"></script>
-<script type="text/javascript" src="GameGL.js"></script>
-<script type="text/javascript" src="Ground.js"></script>
+<script type="text/javascript" src="PlatformGL.js"></script>
 <script type="text/javascript" src="Scenery.js"></script>
-<script type="text/javascript" src="Dijkstra.js"></script>
 <script type="text/javascript" src="Character.js"></script>
-<script type="text/javascript" src="DynCursor.js"></script>
-<script type="text/javascript" src="Interface.js"></script>
-<script type="text/javascript" src="InterfaceCursor.js"></script>
 
-<title>BaseGL</title>
+<title>PlatformGL</title>
 </head>
 <body onload="startGameGL();">
-<div id="divFullScreen"><canvas id="gameGL" style="border: none;"></canvas></div>
+<div id="divFullScreen"><canvas id="platformGL" style="border: none;"></canvas></div>
 </body>
 </html>
