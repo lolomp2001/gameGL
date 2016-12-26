@@ -1,13 +1,9 @@
 function GameGL() {
-	this.scenery = new Scenery();
 	this.character = new Character();
-	
-	this.scenery.initMesh();
-	this.scenery.initTexture();
 	
 	this.character.initMesh();
 	this.character.initTexture();
-	this.character.initPosition(this.gridPosArray);
+	this.character.initPosition(CHAR_INIT_POSX, CHAR_INIT_POSY);
 }
 
 GameGL.prototype.run = function (){
@@ -22,6 +18,5 @@ GameGL.prototype.update = function (){
 
 GameGL.prototype.draw = function (){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	this.scenery.draw();
-	//this.character.draw();
+	this.character.draw();
 }

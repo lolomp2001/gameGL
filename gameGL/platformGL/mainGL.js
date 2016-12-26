@@ -5,6 +5,7 @@ var resolutionLocation;
 var translationLocation;
 var textureLocation;
 var samplerUniform;
+var keyPressed = [];
 
 function startGameGL() {
 	document.documentElement.style.overflow = 'hidden';
@@ -33,7 +34,7 @@ function startGameGL() {
 
 		initShaders();
 		
-		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.clearColor(0.6, 0.86, 1.0, 1.0);
 		gl.clearDepth(1);
 		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
@@ -43,7 +44,11 @@ function startGameGL() {
 		var gameGL = new GameGL();
 		
 		window.addEventListener('keydown', function (evt) {
-			if (evt.keyCode == 70) {
+			if (evt.keyCode == 39 && keyPressed.indexOf(evt.keyCode) == -1) {
+				this.keyPressed.push(evt.keyCode);
+			}
+			
+			else if (evt.keyCode == 70) {
 				var div = document.getElementById("divFullScreen");
 
 				if (div.requestFullscreen) {
@@ -59,6 +64,12 @@ function startGameGL() {
 					div.webkitRequestFullscreen();
 				}
 			}
+		}, false);
+		
+		window.addEventListener('keyup', function (evt) {
+			if (evt.keyCode == 39) {
+				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
+			}			
 		}, false);
 
 		//set resolution fit to browser
