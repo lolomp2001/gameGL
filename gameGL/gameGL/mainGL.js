@@ -130,7 +130,7 @@ function initShaders() {
 
 	gl.useProgram(shaderProgram);
 
-	shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram,	"a_position");
+	shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "a_position");
 	gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 	
 	shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
@@ -206,8 +206,8 @@ function resize() {
 		canvas.style.top = 0.08*window.innerHeight/2 +"px";
 	}
 	
+	gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 	gl.viewportWidth = canvas.width;
-    gl.viewportHeight = canvas.height;
-    
-    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+	gl.viewportHeight = canvas.height;
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 }
