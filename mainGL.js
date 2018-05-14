@@ -34,7 +34,7 @@ function startGameGL() {
 
 		initShaders();
 		
-		gl.clearColor(0.6, 0.86, 1.0, 1.0);
+		gl.clearColor(0, 0, 0, 0);
 		gl.clearDepth(1);
 		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
@@ -44,6 +44,11 @@ function startGameGL() {
 		var gameGL = new GameGL();
 		
 		window.addEventListener('keydown', function (evt) {
+
+            if (evt.keyCode == 37 && keyPressed.indexOf(evt.keyCode) == -1) {
+				this.keyPressed.push(evt.keyCode);
+			}
+		
 			if (evt.keyCode == 39 && keyPressed.indexOf(evt.keyCode) == -1) {
 				this.keyPressed.push(evt.keyCode);
 			}
@@ -67,6 +72,10 @@ function startGameGL() {
 		}, false);
 		
 		window.addEventListener('keyup', function (evt) {
+			if (evt.keyCode == 37) {
+				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
+			}
+
 			if (evt.keyCode == 39) {
 				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
 			}			

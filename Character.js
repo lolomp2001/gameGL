@@ -4,9 +4,7 @@ function Character() {
 	this.squareVerticesTextCoorBuffer;
 	this.CurrentCharacterText;
 	this.CharacterText_E;
-	this.CharacterText_S;
 	this.CharacterText_W;
-	this.CharacterText_N;
 	this.squareVerticesIndexBuffer;
 	this.iXCurrentPos = canvas.width;
 	this.iYCurrentPos = canvas.height;
@@ -18,21 +16,25 @@ function Character() {
 	this.yTrans = 0;
 	this.charVect = [ 0, 0 ];
 	this.charText = 0;
+    this.iSpriteFrameNumber = 0;
 }
 
 Character.prototype.initMesh = function (){
 	this.squareVerticesBuffer = gl.createBuffer();
 
-	var vertices = [ -BACKGROUND_CHARACTER_WIDTH / 2, -BACKGROUND_CHARACTER_HEIGHT / 2,
-	                 -BACKGROUND_CHARACTER_WIDTH / 2, BACKGROUND_CHARACTER_HEIGHT / 2, 
-	                 BACKGROUND_CHARACTER_WIDTH / 2,	BACKGROUND_CHARACTER_HEIGHT / 2, 
-	                 BACKGROUND_CHARACTER_WIDTH / 2, -BACKGROUND_CHARACTER_HEIGHT / 2 ];
+	var vertices = [ -CHARACTER_WIDTH / 2, -CHARACTER_HEIGHT / 2,
+	                 -CHARACTER_WIDTH / 2, CHARACTER_HEIGHT / 2, 
+	                 CHARACTER_WIDTH / 2, CHARACTER_HEIGHT / 2, 
+	                 CHARACTER_WIDTH / 2, -CHARACTER_HEIGHT / 2 ];
 
 	this.squareVerticesBuffer.itemSize = 2;
 	this.squareVerticesBuffer.numItems = 4;
 
 	this.squareVerticesTextCoorBuffer = gl.createBuffer();
-	var textCoord = [ 0.0, 1.0, 0.0, 3/4, 1/2, 3/4, 1/2, 1.0 ];
+	var textCoord = [ 0.0, 1.0, 
+                      0.0, 0.0,
+                      1/4, 0,
+                      1/4, 1.0 ];
 	this.squareVerticesTextCoorBuffer.itemSize = 2;
 	this.squareVerticesTextCoorBuffer.numItems = 4;
 
@@ -62,6 +64,12 @@ Character.prototype.updatePosition = function (){
 		this.charText += this.xTrans;
 		this.charVect = [ 1, 0 ];
 	}
+
+	else if (keyPressed.indexOf(37) != -1) {
+		this.absXCurrentPos -= this.xTrans;
+		this.charText -= this.xTrans;
+		this.charVect = [ -1, 0 ];
+	}
 	
 	else {
 		this.charVect = [ 0, 0 ];
@@ -69,40 +77,29 @@ Character.prototype.updatePosition = function (){
 }
 
 Character.prototype.updateTexture = function (){
-	var iSpriteFrameNumber = 0;
 
-	//cas 1 (0,-1)
-	if (this.charVect[0] == 0 && this.charVect[1] == 1) {
-//		this.CurrentCharacterText = this.CharacterText_N;
-//		var dist = Math.pow(Math.pow(this.xTrans, 2)+Math.pow(this.yTrans, 2),0.5);
-//		iFrameNumber = Math.trunc(dist/this.ANIMATION_RATE);
-	}
-	//cas 2 (1,0)
-	else if (this.charVect[0] == 1 && this.charVect[1] == 0) {
+	//cas 1 (1,0)
+	if (this.charVect[0] == 1 &&  this.charVect[1] == 0) {
 		this.CurrentCharacterText = this.CharacterText_E;
-		var temp = Math.trunc(this.charText * this.ANIMATION_RATE);
-		iSpriteFrameNumber = temp%4;
-		console.log(iSpriteFrameNumber);
+		var temp = Math.trunc(this.charText*this.ANIMATION_RATE);
+        this.iSpriteFrameNumber = temp%CHARACTER_FRAMES_BY_SPRITE;
 	}
-	//cas 3 (0,1)
-	else if (this.charVect == [ 0, -1 ]) {
-//		this.CurrentCharacterText = this.CharacterText_S;
-//		var dist = Math.pow(Math.pow(this.xTrans, 2)+Math.pow(this.yTrans, 2),0.5);
-//		iFrameNumber = Math.trunc(dist/this.ANIMATION_RATE);
-	}
-	//cas 4 (-1,0)
-	else if (this.charVect == [ -1, 0 ]) {
+	//cas 2 (-1,0)
+	else if (this.charVect[0] == -1 &&  this.charVect[1] == 0) {
 		this.CurrentCharacterText = this.CharacterText_W;
-		iSpriteFrameNumber = Math.trunc(this.xTrans/this.ANIMATION_RATE);
+		var temp = Math.trunc(this.charText*this.ANIMATION_RATE);
+        this.iSpriteFrameNumber = temp%CHARACTER_FRAMES_BY_SPRITE;
 	}
 
-	var iImageRow = Math.trunc(iSpriteFrameNumber/2);
-	var iImageCol = iSpriteFrameNumber%2;
+    console.log('this.iSpriteFrameNumber= ', this.iSpriteFrameNumber);
 
-	var textCoord = [ 0.0 + iImageCol / 2, 1.0 - iImageRow / 2,
-	                  0.0 + iImageCol / 2, 1/2 - iImageRow / 2,
-	                  1 / 2 + iImageCol / 2, 1/2 - iImageRow / 2,
-	                  1 / 2 + iImageCol / 2, 1.0 - iImageRow / 2 ];
+	var iImageRow = Math.trunc(this.iSpriteFrameNumber/CHARACTER_SPRITE_COLS);
+	var iImageCol = this.iSpriteFrameNumber%CHARACTER_SPRITE_COLS;
+
+	var textCoord = [ 0.0 + iImageCol / 4, 1.0 - iImageRow,
+	                  0.0 + iImageCol / 4, 0.0 - iImageRow,
+	                  1 / 4 + iImageCol / 4, 0.0 - iImageRow,
+	                  1 / 4 + iImageCol / 4, 1.0 - iImageRow ];
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textCoord), gl.STATIC_DRAW);
@@ -141,12 +138,9 @@ Character.prototype.handleLoadedTexture = function (texture) {
 }
 
 Character.prototype.initTexture = function() {
-	this.CharacterText_E = this.loadTexture("images/mario_e.png");
+	this.CharacterText_E = this.loadTexture("images/character_E.png");
 	this.CurrentCharacterText = this.CharacterText_E;
-
-	//this.CharacterText_S = this.loadTexture("images/mario_s.png");
-	this.CharacterText_W = this.loadTexture("images/mario_w.png");
-	//this.CharacterText_N = this.loadTexture("images/mario_n.png");
+	this.CharacterText_W = this.loadTexture("images/character_W.png");
 }
 
 Character.prototype.loadTexture = function(imagePath) {
