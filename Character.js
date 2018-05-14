@@ -1,5 +1,5 @@
 function Character() {
-	this.ANIMATION_RATE = 1/16;
+	this.ANIMATION_RATE = 1/8;
 	this.squareVerticesBuffer;
 	this.squareVerticesTextCoorBuffer;
 	this.CurrentCharacterText;
@@ -9,14 +9,18 @@ function Character() {
 	this.iXCurrentPos = canvas.width;
 	this.iYCurrentPos = canvas.height;
 	this.absXCurrentPos;
-	this.absYCurrentPos
+	this.absYCurrentPos;
+    this.absYInitPos;
+    this.absTimeInit;
 	this.iXNextPos = this.iXCurrentPos;
 	this.iYNextPos = this.iYCurrentPos;
 	this.xTrans = 3;
-	this.yTrans = 0;
+	this.yTrans = 1;
 	this.charVect = [ 0, 0 ];
 	this.charText = 0;
     this.iSpriteFrameNumber = 0;
+    this.isJumping = false;
+    this.goUp = true;
 }
 
 Character.prototype.initMesh = function (){
@@ -58,21 +62,47 @@ Character.prototype.initPosition = function (xInitPos, yInitPos) {
 	this.absYCurrentPos = yInitPos;
 }
 
+Character.prototype.jump = function (){
+    if (this.goUp && this.absYCurrentPos > (this.absYInitPos - 150)) {
+        this.absYCurrentPos -= this.yTrans*3*(drawCount-this.absTimeInit)^2;
+    }
+    else if (this.absYCurrentPos < this.absYInitPos) {
+        this.goUp = false;
+        this.absYCurrentPos += this.yTrans*2*(drawCount-this.absTimeInit)^2;
+
+        if (this.absYCurrentPos >= this.absYInitPos) {
+            this.absYCurrentPos = this.absYInitPos;
+        }
+    }
+    else {
+        this.isJumping = false;
+    }
+}
+
 Character.prototype.updatePosition = function (){
-	if (keyPressed.indexOf(39) != -1) {
-		this.absXCurrentPos += this.xTrans;
-		this.charText += this.xTrans;
-		this.charVect = [ 1, 0 ];
+    this.charVect = [ 0, 0 ];
+
+	if (!this.isJumping && keyPressed.indexOf(32) != -1) {
+        this.absYInitPos = this.absYCurrentPos;
+        this.absTimeInit = drawCount;
+        this.goUp = true;
+		this.isJumping = true;
 	}
 
-	else if (keyPressed.indexOf(37) != -1) {
+    if (this.isJumping) {
+        this.jump();
+    }
+
+	if (keyPressed.indexOf(37) != -1) {
 		this.absXCurrentPos -= this.xTrans;
 		this.charText -= this.xTrans;
 		this.charVect = [ -1, 0 ];
 	}
-	
-	else {
-		this.charVect = [ 0, 0 ];
+
+	if (keyPressed.indexOf(39) != -1) {
+		this.absXCurrentPos += this.xTrans;
+		this.charText += this.xTrans;
+		this.charVect = [ 1, 0 ];
 	}
 }
 
@@ -90,8 +120,6 @@ Character.prototype.updateTexture = function (){
 		var temp = Math.trunc(this.charText*this.ANIMATION_RATE);
         this.iSpriteFrameNumber = temp%CHARACTER_FRAMES_BY_SPRITE;
 	}
-
-    console.log('this.iSpriteFrameNumber= ', this.iSpriteFrameNumber);
 
 	var iImageRow = Math.trunc(this.iSpriteFrameNumber/CHARACTER_SPRITE_COLS);
 	var iImageCol = this.iSpriteFrameNumber%CHARACTER_SPRITE_COLS;

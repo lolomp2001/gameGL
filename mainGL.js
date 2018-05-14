@@ -6,6 +6,7 @@ var translationLocation;
 var textureLocation;
 var samplerUniform;
 var keyPressed = [];
+var drawCount = 0;
 
 function startGameGL() {
 	document.documentElement.style.overflow = 'hidden';
@@ -34,16 +35,19 @@ function startGameGL() {
 
 		initShaders();
 		
-		gl.clearColor(0, 0, 0, 0);
+		gl.clearColor(1.0, 1.0, 1.0, 1.0);
 		gl.clearDepth(1);
 		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-		
 		var gameGL = new GameGL();
 		
 		window.addEventListener('keydown', function (evt) {
+
+            if (evt.keyCode == 32 && keyPressed.indexOf(evt.keyCode) == -1) {
+				this.keyPressed.push(evt.keyCode);
+			}
 
             if (evt.keyCode == 37 && keyPressed.indexOf(evt.keyCode) == -1) {
 				this.keyPressed.push(evt.keyCode);
@@ -72,20 +76,28 @@ function startGameGL() {
 		}, false);
 		
 		window.addEventListener('keyup', function (evt) {
+			if (evt.keyCode == 32) {
+				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
+			}
+
 			if (evt.keyCode == 37) {
 				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
 			}
 
 			if (evt.keyCode == 39) {
 				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
-			}			
+			}
+
+            if (evt.keyCode == 70) {
+				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
+			}
 		}, false);
 
 		//set resolution fit to browser
 		resize();
 		
 		// Set up to draw the scene periodically.
-		setInterval(function(){gameGL.run();}, 1000/GAME_FPS);
+		setInterval(function(){drawCount += 1; gameGL.run();}, 1000/GAME_FPS);
 	}
 }
 
@@ -204,8 +216,10 @@ function resize() {
 		canvas.style.top = 0.08*window.innerHeight/2 +"px";
 	}
 	
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+
 	gl.viewportWidth = canvas.width;
     gl.viewportHeight = canvas.height;
-    
+
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 }

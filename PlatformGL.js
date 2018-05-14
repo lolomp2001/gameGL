@@ -1,6 +1,5 @@
 function GameGL() {
 	this.character = new Character();
-	
 	this.character.initMesh();
 	this.character.initTexture();
 	this.character.initPosition(CHAR_INIT_POSX, CHAR_INIT_POSY);
