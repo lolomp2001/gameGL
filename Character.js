@@ -136,6 +136,7 @@ Character.prototype.updateTexture = function (){
 }
 
 Character.prototype.draw = function (){
+
 	gl.uniform2f(translationLocation, this.absXCurrentPos, this.absYCurrentPos);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);

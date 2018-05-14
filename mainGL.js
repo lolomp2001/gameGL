@@ -36,6 +36,7 @@ function startGameGL() {
 		initShaders();
 		
 		gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        
 		gl.clearDepth(1);
 		gl.disable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);

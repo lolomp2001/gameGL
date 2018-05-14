@@ -8,16 +8,16 @@ function Scenery() {
 }
 
 Scenery.prototype.initMesh = function (){
-	this.initXPos = canvas.width;
-	this.initYPos = canvas.height;
+	this.initXPos = canvas.width*0.5;
+	this.initYPos = canvas.height*0.5;
 	
 	this.squareVerticesBuffer = gl.createBuffer();
 	
 
-	var vertices = [ -this.initXPos / 2, -this.initYPos / 2,
-	     			-this.initXPos / 2, this.initYPos / 2, 
-	     			this.initXPos / 2,	this.initYPos / 2, 
-	     			this.initXPos / 2, -this.initYPos / 2 ];
+	var vertices = [ -PLATE1_WIDTH / 2, -PLATE1_HEIGHT / 2,
+	     			-PLATE1_WIDTH / 2, PLATE1_HEIGHT / 2, 
+	     			PLATE1_WIDTH / 2,	PLATE1_HEIGHT / 2, 
+	     			PLATE1_WIDTH / 2, -PLATE1_HEIGHT / 2 ];
 	
 	this.squareVerticesBuffer.itemSize = 2;
 	this.squareVerticesBuffer.numItems = 4;
@@ -38,13 +38,12 @@ Scenery.prototype.initMesh = function (){
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textCoord), gl.STATIC_DRAW);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices),
-			gl.STATIC_DRAW);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 	
 }
 
 Scenery.prototype.draw = function (){
-	gl.uniform2f(translationLocation, this.initXPos/2, this.initYPos/2);
+	gl.uniform2f(translationLocation, this.initXPos, this.initYPos);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
 	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, this.squareVerticesBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -68,8 +67,8 @@ Scenery.prototype.handleLoadedTexture = function (texture) {
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,	texture.image);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 
 }
