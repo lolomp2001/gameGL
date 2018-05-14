@@ -16,15 +16,20 @@ GameGL.prototype.addBlock = function (){
 }
 
 GameGL.prototype.collisionTest = function (){
-    this.collisionY = 0;
+    this.collisionY = -1;
 
-    for (var i=0; i<this.block.length; i++) {
-        if (this.character.absXCurrentPos>=(this.block[i].absXCurrentPos-BLOCK1_WIDTH/2)
-              && this.character.absXCurrentPos<=(this.block[i].absXCurrentPos+BLOCK1_WIDTH/2)) {
-            if (this.character.absYCurrentPos<=(this.block[i].absYCurrentPos+BLOCK1_HEIGHT/2+CHARACTER_HEIGHT)
-                  && this.character.absYCurrentPos>=(this.block[i].absYCurrentPos-BLOCK1_HEIGHT/2-CHARACTER_HEIGHT)) {
-                this.collisionY = this.block[i].absYCurrentPos;
-                break;
+    if (this.character.absYCurrentPos>CHAR_INIT_POSY) {
+        this.collisionY = CHAR_INIT_POSY;
+    }
+    else {
+        for (var i=0; i<this.block.length; i++) {
+            if (this.character.absXCurrentPos>=(this.block[i].absXCurrentPos-BLOCK1_WIDTH/2)
+                  && this.character.absXCurrentPos<=(this.block[i].absXCurrentPos+BLOCK1_WIDTH/2)) {
+                if (this.character.absYCurrentPos<=(this.block[i].absYCurrentPos+BLOCK1_HEIGHT/2+CHARACTER_HEIGHT/2)
+                      && this.character.absYCurrentPos>=(this.block[i].absYCurrentPos-BLOCK1_HEIGHT/2-CHARACTER_HEIGHT/2)) {
+                    this.collisionY = this.block[i].absYCurrentPos;
+                    break;
+                }
             }
         }
     }
