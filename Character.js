@@ -22,6 +22,7 @@ function Character() {
     this.isJumping = false;
     this.isFalling = false;
     this.onBlock = false;
+    this.blockPosY = 0;
 }
 
 Character.prototype.initMesh = function (){
@@ -65,7 +66,7 @@ Character.prototype.initPosition = function (xInitPos, yInitPos) {
 
 Character.prototype.jump = function (collisionY){
 
-    var delta = -20*this.yTrans + 2*this.yTrans*(drawCount-this.absTimeInit)^2;
+    var delta = -40*this.yTrans + 4*this.yTrans*(drawCount-this.absTimeInit)^2;
 
     if (delta<=0 && this.absYCurrentPos > (this.absYInitPos - 150)) {      
         this.absYCurrentPos += delta;
@@ -78,7 +79,7 @@ Character.prototype.jump = function (collisionY){
 
 Character.prototype.fall = function (collisionY){
 
-    var delta = 2*this.yTrans*(drawCount-this.absTimeInit)^2;
+    var delta = 4*this.yTrans*(drawCount-this.absTimeInit)^2;
 
     if (delta>=0 && collisionY==-1) { 
         this.isFalling = true;       
@@ -113,16 +114,30 @@ Character.prototype.updatePosition = function (collisionY){
     }
 
 	if (keyPressed.indexOf(37) != -1) {
-		this.absXCurrentPos -= this.xTrans;
-		this.charText -= this.xTrans;
+        if (this.absXCurrentPos>=0.1*canvas.width) {
+		    this.absXCurrentPos -= this.xTrans;
+        }
+
+        this.charText -= this.xTrans;
 		this.charVect = [ -1, 0 ];
 	}
 
 	if (keyPressed.indexOf(39) != -1) {
-		this.absXCurrentPos += this.xTrans;
-		this.charText += this.xTrans;
+        if (this.absXCurrentPos<=0.9*canvas.width) {
+		    this.absXCurrentPos += this.xTrans;    
+        }
+
+        this.charText += this.xTrans;
 		this.charVect = [ 1, 0 ];
 	}
+}
+
+Character.prototype.afterCollisionFix = function (collisionY) {
+	if (collisionY>-1) {
+        this.isFalling = false;
+        this.absYCurrentPos = collisionY - BLOCK1_HEIGHT/2 - CHARACTER_HEIGHT/2;
+        this.absTimeInit = drawCount;
+    }
 }
 
 Character.prototype.updateTexture = function (){

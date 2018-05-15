@@ -19,7 +19,7 @@ GameGL.prototype.collisionTest = function (){
     this.character.onBlock = false;
     this.collisionY = -1;
 
-    if (this.character.absYCurrentPos>=CHAR_INIT_POSY) {
+    if (this.character.absYCurrentPos>=CHAR_INIT_POSY - BLOCK1_HEIGHT/2 - CHARACTER_HEIGHT/2) {
         this.collisionY = CHAR_INIT_POSY;
     }
     else {
@@ -38,8 +38,9 @@ GameGL.prototype.collisionTest = function (){
 }
 
 GameGL.prototype.run = function (){
-    this.collisionTest();
     this.update();
+    this.collisionTest();
+    this.afterCollisionFix();
     this.draw();
     if (this.block.length==0) {
         this.addBlock();
@@ -50,9 +51,20 @@ GameGL.prototype.update = function (){
     this.character.updatePosition(this.collisionY);
     this.character.updateTexture();
 
-    for (var i=0; i<this.block.length; i++) {
-        this.block[i].updatePosition(this.character.charVect);
+    if (this.character.absXCurrentPos<=0.1*canvas.width && this.character.charVect[0]==-1) {
+        for (var i=0; i<this.block.length; i++) {
+            this.block[i].updatePosition(this.character.charVect);
+        }
     }
+    else if (this.character.absXCurrentPos>=0.9*canvas.width && this.character.charVect[0]==1) {
+        for (var i=0; i<this.block.length; i++) {
+            this.block[i].updatePosition(this.character.charVect);
+        }
+    }
+}
+
+GameGL.prototype.afterCollisionFix = function (){
+    this.character.afterCollisionFix(this.collisionY);
 }
 
 GameGL.prototype.draw = function (){
