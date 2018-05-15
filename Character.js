@@ -20,7 +20,8 @@ function Character() {
 	this.charText = 0;
     this.iSpriteFrameNumber = 0;
     this.isJumping = false;
-    this.initYPos;
+    this.isFalling = false;
+    this.onBlock = false;
 }
 
 Character.prototype.initMesh = function (){
@@ -60,30 +61,36 @@ Character.prototype.initMesh = function (){
 Character.prototype.initPosition = function (xInitPos, yInitPos) {
 	this.absXCurrentPos = xInitPos;
 	this.absYCurrentPos = yInitPos;
-    this.initYPos = yInitPos;
 }
 
-Character.prototype.jump = function (){
+Character.prototype.jump = function (collisionY){
 
-    var delta = -40*this.yTrans + this.yTrans*4*(drawCount-this.absTimeInit)^2;
+    var delta = -20*this.yTrans + 2*this.yTrans*(drawCount-this.absTimeInit)^2;
 
-    if (delta<=0 && this.absYCurrentPos > (this.absYInitPos - 300)) {        
+    if (delta<=0 && this.absYCurrentPos > (this.absYInitPos - 150)) {      
         this.absYCurrentPos += delta;
     }
     else {
-        this.absTimeInit = drawCount;
         this.isJumping = false;
+        this.absTimeInit = drawCount;
     }
 }
 
 Character.prototype.fall = function (collisionY){
 
-    var delta = this.yTrans*4*(drawCount-this.absTimeInit)^2;
+    var delta = 2*this.yTrans*(drawCount-this.absTimeInit)^2;
 
-    if (delta>=0 && collisionY==-1) {        
+    if (delta>=0 && collisionY==-1) { 
+        this.isFalling = true;       
         this.absYCurrentPos += delta;
     }
+    else if (this.onBlock) {
+        this.isFalling = false;
+        this.absYCurrentPos = collisionY - BLOCK1_HEIGHT/2 - CHARACTER_HEIGHT/2;
+        this.absTimeInit = drawCount;
+    }
     else {
+        this.isFalling = false;
         this.absTimeInit = drawCount;
     }
 }
@@ -91,14 +98,14 @@ Character.prototype.fall = function (collisionY){
 Character.prototype.updatePosition = function (collisionY){
     this.charVect = [ 0, 0 ];
 
-	if (!this.isJumping && keyPressed.indexOf(32) != -1) {
+	if (!this.isFalling && !this.isJumping && keyPressed.indexOf(32) != -1) {
         this.absYInitPos = this.absYCurrentPos;
         this.absTimeInit = drawCount;
 		this.isJumping = true;
 	}
 
     if (this.isJumping) {
-        this.jump();
+        this.jump(collisionY);
     }
 
     if (!this.isJumping) {

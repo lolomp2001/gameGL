@@ -16,9 +16,10 @@ GameGL.prototype.addBlock = function (){
 }
 
 GameGL.prototype.collisionTest = function (){
+    this.character.onBlock = false;
     this.collisionY = -1;
 
-    if (this.character.absYCurrentPos>CHAR_INIT_POSY) {
+    if (this.character.absYCurrentPos>=CHAR_INIT_POSY) {
         this.collisionY = CHAR_INIT_POSY;
     }
     else {
@@ -28,6 +29,7 @@ GameGL.prototype.collisionTest = function (){
                 if (this.character.absYCurrentPos<=(this.block[i].absYCurrentPos+BLOCK1_HEIGHT/2+CHARACTER_HEIGHT/2)
                       && this.character.absYCurrentPos>=(this.block[i].absYCurrentPos-BLOCK1_HEIGHT/2-CHARACTER_HEIGHT/2)) {
                     this.collisionY = this.block[i].absYCurrentPos;
+                    this.character.onBlock = true;
                     break;
                 }
             }
@@ -39,7 +41,6 @@ GameGL.prototype.run = function (){
     this.collisionTest();
     this.update();
     this.draw();
-
     if (this.block.length==0) {
         this.addBlock();
     }
