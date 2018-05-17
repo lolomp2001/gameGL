@@ -13,6 +13,10 @@ function GameGL() {
     this.isGoingStraight = true;
     this.countHorizontalBlock = 0;
     this.countVertivalBlock = 0;
+    this.collisionLeft = false;
+    this.collisionRight = false;
+    this.collisionX = -1;
+    this.collisionY = -1;
 }
 
 GameGL.prototype.addGroundSand = function (){
@@ -61,6 +65,7 @@ GameGL.prototype.addGroundSand = function (){
             if (this.countVertivalBlock<10) {
                 this.groundSandYPos += 2;
                 this.countVertivalBlock++;
+                groundSand.isLeftWall = true;;
             }
             else {
                 this.countVertivalBlock = 0;
@@ -72,6 +77,7 @@ GameGL.prototype.addGroundSand = function (){
             if (this.countVertivalBlock<10) {
                 this.groundSandYPos -= 2;
                 this.countVertivalBlock++;
+                groundSand.isRightWall = true;
             }
             else {
                 this.countVertivalBlock = 0;
@@ -88,19 +94,49 @@ GameGL.prototype.addGroundSand = function (){
 }
 
 GameGL.prototype.collisionTest = function (){
+    this.collisionLeft = false;
+    this.collisionRight = false;
     this.collisionY = -1;
+    this.collisionX = -1;
 
-    var indexBlock = 0;
-   
+    var indexFirstBlock = -1;
+    var indexMiddleBlock = -1;
+    var indexLastBlock = -1;
+
     for (var i=0; i<this.ground.length; i++) {
-        if ((this.ground[i].absXCurrentPos==this.character.absXCurrentPos) || (this.ground[i].absXCurrentPos==this.character.absXCurrentPos+1)) {
-            indexBlock = i;
+        if ((this.ground[i].absXCurrentPos)==(this.character.absXCurrentPos-CHARACTER_WIDTH/2) || (this.ground[i].absXCurrentPos+1)==(this.character.absXCurrentPos-CHARACTER_WIDTH/2)) {
+            indexFirstBlock = i;
+        }
+        if ((this.ground[i].absXCurrentPos)==this.character.absXCurrentPos || (this.ground[i].absXCurrentPos+1)==this.character.absXCurrentPos) {
+            indexMiddleBlock = i;
+        }
+        if ((this.ground[i].absXCurrentPos)==(this.character.absXCurrentPos+CHARACTER_WIDTH/2) || (this.ground[i].absXCurrentPos+1)==(this.character.absXCurrentPos+CHARACTER_WIDTH/2)) {
+            indexLastBlock = i;
             break;
         }
     }
 
-    if (this.ground.length>0 && this.character.absYCurrentPos>=(this.ground[indexBlock].absYCurrentPos-CHARACTER_HEIGHT)) {
-        this.collisionY = this.ground[indexBlock].absYCurrentPos-CHARACTER_HEIGHT;
+    if (indexFirstBlock!=-1 && indexMiddleBlock!=-1 && indexLastBlock!=-1) {
+        if (this.character.absYCurrentPos>=(this.ground[indexMiddleBlock].absYCurrentPos-CHARACTER_HEIGHT/2)) {
+            this.collisionY = this.ground[indexMiddleBlock].absYCurrentPos-CHARACTER_HEIGHT/2;
+        }
+
+        for (var i=indexFirstBlock; i<indexLastBlock+1; i++){
+            if (this.character.charVect[0]==-1) {
+                if (this.ground[i].isLeftWall && this.collisionY!=-1) {
+                    this.collisionLeft = true;
+                    this.collisionX = this.ground[i].absXCurrentPos;
+                }
+            }
+        }
+        for (var i=indexLastBlock; i>indexFirstBlock-1; i--){
+            if (this.character.charVect[0]==1) {
+                if (this.ground[i].isRightWall && this.collisionY!=-1) {
+                    this.collisionRight = true;
+                    this.collisionX = this.ground[i].absXCurrentPos;
+                }
+            }
+        }
     }
 }
 
@@ -109,7 +145,6 @@ GameGL.prototype.run = function (){
     if (this.lastGroundSandXPos<=0.8*canvas.width) {
         this.addGroundSand();
     }
-
     this.update();
     this.collisionTest();
     this.afterCollisionFix();
@@ -117,12 +152,12 @@ GameGL.prototype.run = function (){
 }
 
 GameGL.prototype.update = function (){
-    this.character.updatePosition(this.collisionY);
+    this.character.updatePosition(this.collisionRight, this.collisionLeft, this.collisionX, this.collisionY);
     this.character.updateTexture();
 }
 
 GameGL.prototype.afterCollisionFix = function (){
-    this.character.afterCollisionFix(this.collisionY);
+    this.character.afterCollisionFix(this.collisionRight, this.collisionLeft, this.collisionX, this.collisionY);
 }
 
 GameGL.prototype.draw = function (){

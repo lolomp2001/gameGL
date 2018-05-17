@@ -9,6 +9,8 @@ function Ground() {
     this.absTimeInit;
     this.whiteTex;
     this.textCoord;
+    this.isRightWall = false;
+    this.isLeftWall = false;
 }
 
 Ground.prototype.initMesh = function (){

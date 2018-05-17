@@ -11,7 +11,7 @@ function Character() {
 	this.absXCurrentPos;
 	this.absYCurrentPos;
     this.absYInitPos;
-    this.absTimeInit;
+    this.absTimeInit = drawCount;
 	this.iXNextPos = this.iXCurrentPos;
 	this.iYNextPos = this.iYCurrentPos;
 	this.xTrans = 3;
@@ -60,7 +60,7 @@ Character.prototype.initPosition = function (xInitPos, yInitPos) {
 	this.absYCurrentPos = yInitPos;
 }
 
-Character.prototype.jump = function (collisionY){
+Character.prototype.jump = function (){
 
     var delta = -40*this.yTrans + 4*this.yTrans*(drawCount-this.absTimeInit)^2;
 
@@ -91,7 +91,7 @@ Character.prototype.fall = function (collisionY){
     }
 }
 
-Character.prototype.updatePosition = function (collisionY){
+Character.prototype.updatePosition = function (collisionRight, collisionLeft, collisionX, collisionY){
     this.charVect = [0, 0];
 
 	if (!this.isFalling && !this.isJumping && keyPressed.indexOf(32) != -1) {
@@ -101,15 +101,14 @@ Character.prototype.updatePosition = function (collisionY){
 	}
 
     if (this.isJumping) {
-        this.jump(collisionY);
+        this.jump();
     }
 
     if (!this.isJumping) {
         this.fall(collisionY);
     }
-
 	if (keyPressed.indexOf(37) != -1) {
-        if (this.absXCurrentPos>=0.1*canvas.width) {
+        if (this.absXCurrentPos>=0.1*canvas.width && !collisionLeft) {
 		    this.absXCurrentPos -= this.speedX*this.xTrans;
         }
 
@@ -118,7 +117,7 @@ Character.prototype.updatePosition = function (collisionY){
 	}
 
 	if (keyPressed.indexOf(39) != -1) {
-        if (this.absXCurrentPos<=0.9*canvas.width) {
+        if (this.absXCurrentPos<=0.9*canvas.width && !collisionRight) {
 		    this.absXCurrentPos += this.speedX*this.xTrans;    
         }
 
@@ -127,16 +126,25 @@ Character.prototype.updatePosition = function (collisionY){
 	}
 
     if (keyPressed.indexOf(16) != -1) {
-        this.speedX = 3;
+        this.speedX = 1;
     }
     else {
         this.speedX = 1;
     }
 }
 
-Character.prototype.afterCollisionFix = function (collisionY){
+Character.prototype.afterCollisionFix = function (collisionRight, collisionLeft, collisionX, collisionY){
     if (collisionY!=-1) {
         this.absYCurrentPos = collisionY;
+    }
+
+    if (collisionX!=-1) {
+        if (collisionRight) {
+            this.absXCurrentPos = collisionX - CHARACTER_WIDTH/2;
+        }
+        else if (collisionLeft) {
+            this.absXCurrentPos = collisionX + CHARACTER_WIDTH/2;
+        }
     }
 }
 
