@@ -135,8 +135,8 @@ Character.prototype.updatePosition = function (collisionY){
 }
 
 Character.prototype.afterCollisionFix = function (collisionY){
-    if (collisionY>=GROUND_INIT_POSY-CHARACTER_HEIGHT) {
-        this.absYCurrentPos = GROUND_INIT_POSY-CHARACTER_HEIGHT;
+    if (collisionY!=-1) {
+        this.absYCurrentPos = collisionY;
     }
 }
 
