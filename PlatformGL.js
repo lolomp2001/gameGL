@@ -19,9 +19,6 @@ GameGL.prototype.addGroundSand = function (){
     while (i<GROUNDSAND_PER_DRAW) {
         var groundSand = new Ground();
         groundSand.initMesh();
-        groundSand.initPosition(this.groundSandXPos, this.groundSandYPos);
-        this.lastGroundSandXPos = groundSand.absXCurrentPos;
-        this.ground.push(groundSand);
         this.groundSandXPos += 2;
         
         var rand = Math.round(2*Math.random() - 1);
@@ -48,12 +45,16 @@ GameGL.prototype.addGroundSand = function (){
             this.countUpOrDown++;
         }
         else if (this.countUpOrDown>=20) {
+            this.groundSandXPos -= 2;
             this.isGoingUp = false;
             this.isGoingDown = false;
             this.isGoingStraight = false;
             this.countUpOrDown=0;
         }
 
+        groundSand.initPosition(this.groundSandXPos, this.groundSandYPos);
+        this.lastGroundSandXPos = groundSand.absXCurrentPos;
+        this.ground.push(groundSand);
         i++;
     }
 }
