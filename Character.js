@@ -21,27 +21,22 @@ function Character() {
     this.iSpriteFrameNumber = 0;
     this.isJumping = false;
     this.isFalling = false;
-    this.onBlock = false;
-    this.underBlock = true;
-    this.blockPosY = 0;
     this.speedX = 1;
 }
 
 Character.prototype.initMesh = function (){
 	this.squareVerticesBuffer = gl.createBuffer();
-
 	var vertices = [ -CHARACTER_WIDTH / 2, -CHARACTER_HEIGHT / 2,
 	                 -CHARACTER_WIDTH / 2, CHARACTER_HEIGHT / 2, 
 	                 CHARACTER_WIDTH / 2, CHARACTER_HEIGHT / 2, 
 	                 CHARACTER_WIDTH / 2, -CHARACTER_HEIGHT / 2 ];
-
 	this.squareVerticesBuffer.itemSize = 2;
 	this.squareVerticesBuffer.numItems = 4;
 
 	this.squareVerticesTextCoorBuffer = gl.createBuffer();
 	var textCoord = [ 0.0, 1.0, 
                       0.0, 0.0,
-                      1/4, 0,
+                      1/4, 0.0,
                       1/4, 1.0 ];
 	this.squareVerticesTextCoorBuffer.itemSize = 2;
 	this.squareVerticesTextCoorBuffer.numItems = 4;
@@ -58,7 +53,6 @@ Character.prototype.initMesh = function (){
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
 }
 
 Character.prototype.initPosition = function (xInitPos, yInitPos) {
@@ -100,8 +94,7 @@ Character.prototype.fall = function (collisionY){
 Character.prototype.updatePosition = function (collisionY){
     this.charVect = [0, 0];
 
-	if (!this.underBlock && !this.isFalling && !this.isJumping && keyPressed.indexOf(32) != -1) {
-        this.onBlock = false;
+	if (!this.isFalling && !this.isJumping && keyPressed.indexOf(32) != -1) {
         this.absYInitPos = this.absYCurrentPos;
         this.absTimeInit = drawCount;
 		this.isJumping = true;
@@ -141,25 +134,10 @@ Character.prototype.updatePosition = function (collisionY){
     }
 }
 
-Character.prototype.afterCollisionFix = function (collisionY) {
-   if (collisionY==CHAR_INIT_POSY - 0.3*CHARACTER_HEIGHT) {
-       this.charVect[1] = 0;
-       this.absYCurrentPos = CHAR_INIT_POSY - 0.3*CHARACTER_HEIGHT;
-       this.underBlock = false;
-   }
-   else if (collisionY!=-1 && this.isJumping) {
-       this.charVect[1] = 0;
-       this.absYCurrentPos = collisionY + 0.8*CHARACTER_HEIGHT;
-       this.isJumping = false;
-       this.isFalling = true;
-       this.underBlock = true;
-       this.absTimeInit = drawCount;
-   }
-   else if (collisionY!=-1 && this.isFalling) {
-       this.charVect[1] = 0;
-       this.absYCurrentPos = collisionY - 0.8*CHARACTER_HEIGHT;
-       this.underBlock = false;
-   }
+Character.prototype.afterCollisionFix = function (collisionY){
+    if (collisionY>=GROUND_INIT_POSY-CHARACTER_HEIGHT) {
+        this.absYCurrentPos = GROUND_INIT_POSY-CHARACTER_HEIGHT;
+    }
 }
 
 Character.prototype.updateTexture = function (){
@@ -192,7 +170,6 @@ Character.prototype.updateTexture = function (){
 }
 
 Character.prototype.draw = function (){
-
 	gl.uniform2f(translationLocation, this.absXCurrentPos, this.absYCurrentPos);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesBuffer);
@@ -201,14 +178,16 @@ Character.prototype.draw = function (){
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.squareVerticesTextCoorBuffer);
 	gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, this.squareVerticesTextCoorBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-	gl.activeTexture(gl.TEXTURE0);
-
+    gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.CurrentCharacterText);
-	gl.uniform1i(samplerUniform, 0);
+    gl.uniform1i(samplerUniform, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.squareVerticesIndexBuffer);
 
+    gl.disableVertexAttribArray(shaderProgram.vertexColorAttribute);
+    gl.vertexAttrib4f(shaderProgram.vertexColorAttribute, 1, 1, 1, 1);
 	gl.drawElements(gl.TRIANGLES, this.squareVerticesIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
 }
 
 Character.prototype.handleLoadedTexture = function (texture) {

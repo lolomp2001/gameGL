@@ -1,92 +1,86 @@
 function GameGL() {
-    this.ground = new Ground();
-    this.ground.initMesh();
-    this.ground.initTexture();
-
+    this.ground = [];
     this.character = new Character();
     this.character.initMesh();
     this.character.initTexture();
     this.character.initPosition(CHAR_INIT_POSX, CHAR_INIT_POSY);
-    
-    this.nextBlockX = 0;
-    this.nextBlockY = BLOCK1_INIT_POSY;
-    this.block = [];
-    this.collisionY = 0;
+    this.groundSandXPos = 0;
+    this.groundSandYPos = GROUND_INIT_POSY;
+    this.lastGroundSandXPos = 0;
+    this.isGoingUp = false;
+    this.isGoingDown = false;
+    this.isGoingStraight = false;
+    this.countUpOrDown = 0;
 }
 
-GameGL.prototype.addBlock = function (){
-    var block1 = new Block1();
-    block1.initMesh();
-    block1.initTexture();
-    block1.initPosition(this.nextBlockX, this.nextBlockY);
-    this.block.push(block1);
+GameGL.prototype.addGroundSand = function (){
+    var i = 0;
+
+    while (i<GROUNDSAND_PER_DRAW) {
+        var groundSand = new Ground();
+        groundSand.initMesh();
+        groundSand.initPosition(this.groundSandXPos, this.groundSandYPos);
+        this.lastGroundSandXPos = groundSand.absXCurrentPos;
+        this.ground.push(groundSand);
+        this.groundSandXPos += 2;
+        
+        var rand = Math.round(2*Math.random() - 1);
+
+        if (!this.isGoingUp && !this.isGoingDown && !this.isGoingStraight && rand<0) {
+            this.isGoingUp = true;
+        }
+        else if (!this.isGoingUp && !this.isGoingDown && !this.isGoingStraight && rand>0) {
+            this.isGoingDown = true;
+        }
+        else if (!this.isGoingUp && !this.isGoingDown && !this.isGoingStraight && rand==0) {
+            this.isGoingStraight = true;
+        }
+
+        if (this.isGoingUp && this.countUpOrDown<20) {
+            this.groundSandYPos -= 1;
+            this.countUpOrDown++;
+        }
+        else if (this.isGoingDown && this.countUpOrDown<20) {
+            this.groundSandYPos += 1;
+            this.countUpOrDown++;
+        }
+        else if (this.isGoingStraight && this.countUpOrDown<20) {
+            this.countUpOrDown++;
+        }
+        else if (this.countUpOrDown>=20) {
+            this.isGoingUp = false;
+            this.isGoingDown = false;
+            this.isGoingStraight = false;
+            this.countUpOrDown=0;
+        }
+
+        i++;
+    }
 }
 
 GameGL.prototype.collisionTest = function (){
     this.collisionY = -1;
 
-    if (this.character.absYCurrentPos>=CHAR_INIT_POSY - 0.3*CHARACTER_HEIGHT) {
-        this.collisionY = CHAR_INIT_POSY - 0.3*CHARACTER_HEIGHT;
-    }
-    else {
-        for (var i=0; i<this.block.length; i++) {
-            if (this.character.absXCurrentPos>=(this.block[i].absXCurrentPos-BLOCK1_WIDTH/2)
-                  && this.character.absXCurrentPos<=(this.block[i].absXCurrentPos+BLOCK1_WIDTH/2)) {
-                if (this.character.absYCurrentPos<=(this.block[i].absYCurrentPos+BLOCK1_HEIGHT/2+CHARACTER_HEIGHT/2)
-                      && this.character.absYCurrentPos>=(this.block[i].absYCurrentPos-BLOCK1_HEIGHT/2-CHARACTER_HEIGHT/2)) {
-                    this.collisionY = this.block[i].absYCurrentPos;
-                    break;
-                }
-            }
-        }
+    if (this.character.absYCurrentPos>=(GROUND_INIT_POSY-CHARACTER_HEIGHT)) {
+        this.collisionY = GROUND_INIT_POSY;
     }
 }
 
 GameGL.prototype.run = function (){
+
+    if (this.lastGroundSandXPos<=0.8*canvas.width) {
+        this.addGroundSand();
+    }
+
     this.update();
     this.collisionTest();
     this.afterCollisionFix();
     this.draw();
-
-    if (this.block.length<=MAX_BLOCK) {
-        if (this.block.length>0) {
-            this.nextBlockX = this.block[this.block.length-1].absXCurrentPos + 150;
-        }
-        else {
-            this.nextBlockX += 150;
-        }
-
-        this.nextBlockY -= (Math.sign(0.5-Math.random())) * (18 + 100*Math.random());
-
-        if (this.nextBlockY >= BLOCK1_INIT_POSY) {
-            this.nextBlockY = BLOCK1_INIT_POSY - 18 - 100*Math.random();
-        }
-
-        this.addBlock(this.nextBlockX, this.nextBlockY);   
-    }
-
-    for (var i=0; i<this.block.length; i++) {
-        if (this.block[i].absXCurrentPos<=-BLOCK1_WIDTH/2) {
-            var index = this.block.indexOf(this.block[i]);
-            this.block.splice(index, 1);
-        }
-    }
 }
 
 GameGL.prototype.update = function (){
     this.character.updatePosition(this.collisionY);
     this.character.updateTexture();
-
-    if (this.character.absXCurrentPos<=0.1*canvas.width && this.character.charVect[0]==-1) {
-        for (var i=0; i<this.block.length; i++) {
-            this.block[i].updatePosition(this.character.charVect);
-        }
-    }
-    else if (this.character.absXCurrentPos>=0.9*canvas.width && this.character.charVect[0]==1) {
-        for (var i=0; i<this.block.length; i++) {
-            this.block[i].updatePosition(this.character.charVect);
-        }
-    }
 }
 
 GameGL.prototype.afterCollisionFix = function (){
@@ -95,10 +89,9 @@ GameGL.prototype.afterCollisionFix = function (){
 
 GameGL.prototype.draw = function (){
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    this.ground.draw();
-    this.character.draw();
     
-    for (var i=0; i<this.block.length; i++) {
-        this.block[i].draw();
+    for (var i=0; i<this.ground.length; i++) {
+        this.ground[i].draw();
     }
+    this.character.draw();
 }

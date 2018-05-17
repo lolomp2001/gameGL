@@ -155,6 +155,9 @@ function initShaders() {
 	shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
 	gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
 
+    shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "a_color");
+    gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);
+
 	resolutionLocation = gl.getUniformLocation(shaderProgram, "u_resolution");
 	gl.uniform2f(resolutionLocation, gl.viewportWidth, gl.viewportHeight);
 	
