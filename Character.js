@@ -22,7 +22,9 @@ function Character() {
     this.isJumping = false;
     this.isFalling = false;
     this.onBlock = false;
+    this.underBlock = true;
     this.blockPosY = 0;
+    this.speedX = 1;
 }
 
 Character.prototype.initMesh = function (){
@@ -68,10 +70,12 @@ Character.prototype.jump = function (collisionY){
 
     var delta = -40*this.yTrans + 4*this.yTrans*(drawCount-this.absTimeInit)^2;
 
-    if (delta<=0 && this.absYCurrentPos > (this.absYInitPos - 150)) {      
+    if (delta<=0 && this.absYCurrentPos > (this.absYInitPos - 150)) {
+        this.charVect[1] = -1;
         this.absYCurrentPos += delta;
     }
     else {
+        this.charVect[1] = 0;
         this.isJumping = false;
         this.absTimeInit = drawCount;
     }
@@ -81,25 +85,23 @@ Character.prototype.fall = function (collisionY){
 
     var delta = 4*this.yTrans*(drawCount-this.absTimeInit)^2;
 
-    if (delta>=0 && collisionY==-1) { 
-        this.isFalling = true;       
+    if (delta>0 && collisionY==-1) {
+        this.charVect[1] = 1;
+        this.isFalling = true;
         this.absYCurrentPos += delta;
     }
-    else if (this.onBlock) {
-        this.isFalling = false;
-        this.absYCurrentPos = collisionY - BLOCK1_HEIGHT/2 - CHARACTER_HEIGHT/2;
-        this.absTimeInit = drawCount;
-    }
     else {
+        this.charVect[1] = 0;
         this.isFalling = false;
         this.absTimeInit = drawCount;
     }
 }
 
 Character.prototype.updatePosition = function (collisionY){
-    this.charVect = [ 0, 0 ];
+    this.charVect = [0, 0];
 
-	if (!this.isFalling && !this.isJumping && keyPressed.indexOf(32) != -1) {
+	if (!this.underBlock && !this.isFalling && !this.isJumping && keyPressed.indexOf(32) != -1) {
+        this.onBlock = false;
         this.absYInitPos = this.absYCurrentPos;
         this.absTimeInit = drawCount;
 		this.isJumping = true;
@@ -115,41 +117,61 @@ Character.prototype.updatePosition = function (collisionY){
 
 	if (keyPressed.indexOf(37) != -1) {
         if (this.absXCurrentPos>=0.1*canvas.width) {
-		    this.absXCurrentPos -= this.xTrans;
+		    this.absXCurrentPos -= this.speedX*this.xTrans;
         }
 
         this.charText -= this.xTrans;
-		this.charVect = [ -1, 0 ];
+		this.charVect[0] = -1;
 	}
 
 	if (keyPressed.indexOf(39) != -1) {
         if (this.absXCurrentPos<=0.9*canvas.width) {
-		    this.absXCurrentPos += this.xTrans;    
+		    this.absXCurrentPos += this.speedX*this.xTrans;    
         }
 
         this.charText += this.xTrans;
-		this.charVect = [ 1, 0 ];
+		this.charVect[0] = 1;
 	}
+
+    if (keyPressed.indexOf(16) != -1) {
+        this.speedX = 3;
+    }
+    else {
+        this.speedX = 1;
+    }
 }
 
 Character.prototype.afterCollisionFix = function (collisionY) {
-	if (collisionY>-1) {
-        this.isFalling = false;
-        this.absYCurrentPos = collisionY - BLOCK1_HEIGHT/2 - CHARACTER_HEIGHT/2;
-        this.absTimeInit = drawCount;
-    }
+   if (collisionY==CHAR_INIT_POSY - 0.3*CHARACTER_HEIGHT) {
+       this.charVect[1] = 0;
+       this.absYCurrentPos = CHAR_INIT_POSY - 0.3*CHARACTER_HEIGHT;
+       this.underBlock = false;
+   }
+   else if (collisionY!=-1 && this.isJumping) {
+       this.charVect[1] = 0;
+       this.absYCurrentPos = collisionY + 0.8*CHARACTER_HEIGHT;
+       this.isJumping = false;
+       this.isFalling = true;
+       this.underBlock = true;
+       this.absTimeInit = drawCount;
+   }
+   else if (collisionY!=-1 && this.isFalling) {
+       this.charVect[1] = 0;
+       this.absYCurrentPos = collisionY - 0.8*CHARACTER_HEIGHT;
+       this.underBlock = false;
+   }
 }
 
 Character.prototype.updateTexture = function (){
 
 	//cas 1 (1,0)
-	if (this.charVect[0] == 1 &&  this.charVect[1] == 0) {
+	if (this.charVect[0] == 1) {
 		this.CurrentCharacterText = this.CharacterText_E;
 		var temp = Math.trunc(this.charText*this.ANIMATION_RATE);
         this.iSpriteFrameNumber = temp%CHARACTER_FRAMES_BY_SPRITE;
 	}
 	//cas 2 (-1,0)
-	else if (this.charVect[0] == -1 &&  this.charVect[1] == 0) {
+	else if (this.charVect[0] == -1) {
 		this.CurrentCharacterText = this.CharacterText_W;
 		var temp = Math.trunc(this.charText*this.ANIMATION_RATE);
         this.iSpriteFrameNumber = temp%CHARACTER_FRAMES_BY_SPRITE;

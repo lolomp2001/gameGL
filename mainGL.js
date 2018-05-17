@@ -46,6 +46,10 @@ function startGameGL() {
 		
 		window.addEventListener('keydown', function (evt) {
 
+			if (evt.keyCode == 16 && keyPressed.indexOf(evt.keyCode) == -1) {
+				this.keyPressed.push(evt.keyCode);
+			}
+
             if (evt.keyCode == 32 && keyPressed.indexOf(evt.keyCode) == -1) {
 				this.keyPressed.push(evt.keyCode);
 			}
@@ -77,6 +81,10 @@ function startGameGL() {
 		}, false);
 		
 		window.addEventListener('keyup', function (evt) {
+			if (evt.keyCode == 16) {
+				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
+			}
+
 			if (evt.keyCode == 32) {
 				this.keyPressed.splice(keyPressed.indexOf(evt.keyCode),1);
 			}
