@@ -121,7 +121,7 @@ GameGL.prototype.collisionTest = function (){
             this.collisionY = this.ground[indexMiddleBlock].absYCurrentPos-CHARACTER_HEIGHT/2;
         }
 
-        for (var i=indexFirstBlock; i<indexLastBlock+1; i++){
+        for (var i=indexFirstBlock; i<indexMiddleBlock+1; i++){
             if (this.character.charVect[0]==-1) {
                 if (this.ground[i].isLeftWall && this.collisionY!=-1) {
                     this.collisionLeft = true;
@@ -129,7 +129,7 @@ GameGL.prototype.collisionTest = function (){
                 }
             }
         }
-        for (var i=indexLastBlock; i>indexFirstBlock-1; i--){
+        for (var i=indexLastBlock; i>indexMiddleBlock-1; i--){
             if (this.character.charVect[0]==1) {
                 if (this.ground[i].isRightWall && this.collisionY!=-1) {
                     this.collisionRight = true;
